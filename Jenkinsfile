@@ -25,14 +25,6 @@ pipeline {
         sh 'git config user.name "Jenkins"'
       }
     }
-    stage('Snapshot') {
-      when {
-        branch 'dev'
-      }
-      steps {
-        sh './gradlew release'
-      }
-    }
     stage('Release') {
       when {
         branch 'main'
