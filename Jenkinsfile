@@ -5,10 +5,24 @@ pipeline {
       args '-v /home/jenkins/.gradle:/var/gradle/.gradle -v /home/jenkins/.gnupg:/.gnupg -e GRADLE_OPTS=-Duser.home=/var/gradle'
     }
   }
+  environment {
+    GPG_SECRET = credentials('gpg_password')
+  }
   stages {
     stage('Build') {
       steps {
         sh './gradlew build'
+      }
+    }
+    stage ('Set Git Information') {
+      steps {
+        sh 'echo \'echo \$GITHUB_PSW\' > ./.git-askpass'
+        sh 'chmod +x ./.git-askpass'
+        sh 'git config url."https://api@github.com/".insteadOf "https://github.com/"'
+        sh 'git config url."https://ssh@github.com/".insteadOf "ssh://git@github.com/"'
+        sh 'git config url."https://git@github.com/".insteadOf "git@github.com:"'
+        sh 'git config user.email "build@taddiken.online"'
+        sh 'git config user.name "Jenkins"'
       }
     }
     stage('Snapshot') {
@@ -16,15 +30,15 @@ pipeline {
         branch 'dev'
       }
       steps {
-        sh './gradlew final'
+        sh './gradlew release'
       }
     }
     stage('Release') {
       when {
-        branch 'master'
+        branch 'main'
       }
       steps {
-        sh './gradlew final'
+        sh './gradlew release'
       }
     }
   }
