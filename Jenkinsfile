@@ -16,7 +16,15 @@ pipeline {
         branch 'dev'
       }
       steps {
-        sh './gradlew snapshot'
+        sh './gradlew final'
+      }
+    }
+    stage('Release') {
+      when {
+        branch 'master'
+      }
+      steps {
+        sh './gradlew final'
       }
     }
   }
