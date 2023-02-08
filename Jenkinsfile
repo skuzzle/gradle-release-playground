@@ -30,12 +30,20 @@ pipeline {
         sh 'git status'
       }
     }
+    stage('Snapshot') {
+      when {
+        branch 'dev'
+      }
+      steps {
+        sh './gradlew snapshot'
+      }
+    }
     stage('Release') {
       when {
         branch 'main'
       }
       steps {
-        sh './gradlew release'
+        sh './gradlew final'
       }
     }
   }
