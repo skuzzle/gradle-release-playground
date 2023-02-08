@@ -11,7 +11,7 @@ pipeline {
         sh './gradlew build'
       }
     }
-    stage('Build') {
+    stage('Snapshot') {
       when {
         branch 'dev'
       }
