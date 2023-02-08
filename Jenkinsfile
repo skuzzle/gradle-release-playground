@@ -11,5 +11,13 @@ pipeline {
         sh './gradlew build'
       }
     }
+    stage('Build') {
+      when {
+        branch 'dev'
+      }
+      steps {
+        sh './gradlew snapshot'
+      }
+    }
   }
 }
