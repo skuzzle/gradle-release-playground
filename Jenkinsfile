@@ -6,7 +6,7 @@ pipeline {
     }
   }
   environment {
-    GPG_SECRET = credentials('gpg_password')
+    GITHUB = credentials('Github-Username-Pw')
   }
   stages {
     stage('Build') {
@@ -23,6 +23,11 @@ pipeline {
         sh 'git config url."https://git@github.com/".insteadOf "git@github.com:"'
         sh 'git config user.email "build@taddiken.online"'
         sh 'git config user.name "Jenkins"'
+      }
+    }
+    stage('Show git status') {
+      steps {
+        sh 'git status'
       }
     }
     stage('Release') {
