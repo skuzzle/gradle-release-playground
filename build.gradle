@@ -1,3 +1,0 @@
-plugins {
-  id 'org.ajoberstar.reckon' version '0.16.1'
-}
