@@ -37,7 +37,7 @@ pipeline {
         sh './gradlew release'
       }
     }
-    stage('Release') {
+    stage('Release GitHub') {
       steps {
         sh './gradlew githubRelease -Pgh_token=${GITHUB_RELEASE_TOKEN}'
       }
