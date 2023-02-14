@@ -1,3 +1,10 @@
 plugins {
+    id 'net.researchgate.release' version '3.0.2'
+}
+
+release {
+
+}
+plugins {
     id "com.netflix.nebula.release" version "17.1.0"
 }
