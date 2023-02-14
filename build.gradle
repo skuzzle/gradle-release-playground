@@ -3,10 +3,15 @@ plugins {
 }
 
 release {
-    failOnCommitNeeded = false
     pushReleaseVersionBranch = 'main'
     git {
         requireBranch.set("dev")
     }
 }
-afterReleaseBuild.dependsOn(":readme:generateReadmeAndReleaseNotes")
+
+tasks.register("Commit files") {
+    dependsOn(":readme:generateReadmeAndReleaseNotes")
+    "git add README.md".execute()
+    "git commit -m \"Update README\"".execute()
+}
+afterReleaseBuild.dependsOn("Commit files")
