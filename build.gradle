@@ -9,4 +9,4 @@ release {
         requireBranch.set("dev")
     }
 }
-afterReleaseBuild.dependsOn("generateReadmeAndReleaseNotes")
+afterReleaseBuild.dependsOn(":readme:generateReadmeAndReleaseNotes")
