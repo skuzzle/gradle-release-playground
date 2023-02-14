@@ -3,6 +3,7 @@ plugins {
 }
 
 release {
+    pushReleaseVersionBranch = 'main'
     git {
         requireBranch.set("dev")
     }

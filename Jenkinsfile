@@ -9,11 +9,6 @@ pipeline {
     GITHUB = credentials('Github-Username-Pw')
   }
   stages {
-    stage('Build') {
-      steps {
-        sh './gradlew build'
-      }
-    }
     stage ('Set Git Information') {
       steps {
         sh 'echo \'echo \$GITHUB_PSW\' > ./.git-askpass'
@@ -23,6 +18,11 @@ pipeline {
         sh 'git config url."https://git@github.com/".insteadOf "git@github.com:"'
         sh 'git config user.email "build@taddiken.online"'
         sh 'git config user.name "Jenkins"'
+      }
+    }
+    stage('Build') {
+      steps {
+        sh './gradlew build'
       }
     }
     stage('Show git status') {
