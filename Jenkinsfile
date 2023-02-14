@@ -7,6 +7,7 @@ pipeline {
   }
   environment {
     GITHUB = credentials('Github-Username-Pw')
+    GIT_ASKPASS='./.git-askpass'
   }
   stages {
     stage ('Set Git Information') {
