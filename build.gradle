@@ -16,7 +16,7 @@ githubRelease {
     owner "skuzzle"
     repo "gradle-release-playground"
     body provider({
-        file("RELEASE_NOTES").getText()
+        file("RELEASE_NOTES.md").getText()
     })
 }
 
