@@ -1,3 +1,3 @@
 <!-- This file is auto generated during release from readme/README.md -->
 
-Test-Readme. The Version is: 0.1.2-SNAPSHOT
+Test-Readme. The Version is: 0.1.3
