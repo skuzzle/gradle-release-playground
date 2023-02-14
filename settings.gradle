@@ -1,11 +1,2 @@
-plugins {
-    id 'org.ajoberstar.reckon.settings' version '0.17.0-beta.4'
-}
-
-reckon {
-    scopeCalc = calcScopeFromProp() | calcScopeFromCommitMessages()
-    snapshots()
-}
-
 rootProject.name = 'gradle-release-playground'
 include 'hello-world'

@@ -1,0 +1,17 @@
+plugins {
+    id 'net.researchgate.release' version '3.0.2'
+}
+
+release {
+    pushReleaseVersionBranch = 'main'
+    git {
+        requireBranch.set("dev")
+    }
+}
+afterReleaseBuild.dependsOn("ShowVersion")
+
+tasks.register("ShowVersion") {
+    doLast {
+        println "Current version is ${project.version}"
+    }
+}

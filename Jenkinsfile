@@ -7,13 +7,9 @@ pipeline {
   }
   environment {
     GITHUB = credentials('Github-Username-Pw')
+    GIT_ASKPASS='./.git-askpass'
   }
   stages {
-    stage('Build') {
-      steps {
-        sh './gradlew build'
-      }
-    }
     stage ('Set Git Information') {
       steps {
         sh 'echo \'echo \$GITHUB_PSW\' > ./.git-askpass'
@@ -23,6 +19,11 @@ pipeline {
         sh 'git config url."https://git@github.com/".insteadOf "git@github.com:"'
         sh 'git config user.email "build@taddiken.online"'
         sh 'git config user.name "Jenkins"'
+      }
+    }
+    stage('Build') {
+      steps {
+        sh './gradlew build'
       }
     }
     stage('Show git status') {
@@ -35,15 +36,7 @@ pipeline {
         branch 'dev'
       }
       steps {
-        sh './gradlew snapshot'
-      }
-    }
-    stage('Release') {
-      when {
-        branch 'main'
-      }
-      steps {
-        sh './gradlew final'
+        sh './gradlew release'
       }
     }
   }
