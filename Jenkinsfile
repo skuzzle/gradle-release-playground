@@ -7,6 +7,7 @@ pipeline {
   }
   environment {
     GITHUB = credentials('Github-Username-Pw')
+    GITHUB_RELEASE_TOKEN = credentials('github_registry_release')
     GIT_ASKPASS='./.git-askpass'
   }
   stages {
@@ -31,12 +32,14 @@ pipeline {
         sh 'git status'
       }
     }
-    stage('Snapshot') {
-      when {
-        branch 'dev'
-      }
+    stage('Release') {
       steps {
         sh './gradlew release'
+      }
+    }
+    stage('Release GitHub') {
+      steps {
+        sh './gradlew githubRelease -Pgh_token=${GITHUB_RELEASE_TOKEN}'
       }
     }
   }

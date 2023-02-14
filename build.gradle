@@ -1,17 +1,34 @@
 plugins {
     id 'net.researchgate.release' version '3.0.2'
+    id "com.github.breadmoirai.github-release" version "2.4.1"
 }
 
 release {
     pushReleaseVersionBranch = 'main'
+    tagTemplate = 'v$version'
     git {
         requireBranch.set("dev")
     }
 }
 
+githubRelease {
+    token provider({ project.findProperty("gh_token") })
+    owner "skuzzle"
+    repo "gradle-release-playground"
+    body provider({
+        file("RELEASE_NOTES").getText()
+    })
+}
+
+tasks.named("githubRelease") {
+    doFirst {
+        "git checkout main".execute()
+    }
+}
+
 tasks.register("Commit files") {
     dependsOn(":readme:generateReadmeAndReleaseNotes")
-    "git add README.md".execute()
-    "git commit -m \"Update README\"".execute()
+    "git add README.md RELEASE_NOTES.md".execute()
+    "git commit -m \"Update README and Release notes\"".execute()
 }
 afterReleaseBuild.dependsOn("Commit files")
