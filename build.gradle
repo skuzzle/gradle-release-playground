@@ -3,8 +3,14 @@ plugins {
 }
 
 release {
-
+    git {
+        requireBranch.set("dev")
+    }
 }
-plugins {
-    id "com.netflix.nebula.release" version "17.1.0"
+afterReleaseBuild.dependsOn("ShowVersion")
+
+tasks.register("ShowVersion") {
+    doLast {
+        println "Current version is ${project.version}"
+    }
 }

@@ -6,7 +6,7 @@ pipeline {
     }
   }
   environment {
-    GPG_SECRET = credentials('gpg_password')
+    GITHUB = credentials('Github-Username-Pw')
   }
   stages {
     stage('Build') {
@@ -25,9 +25,14 @@ pipeline {
         sh 'git config user.name "Jenkins"'
       }
     }
-    stage('Release') {
+    stage('Show git status') {
+      steps {
+        sh 'git status'
+      }
+    }
+    stage('Snapshot') {
       when {
-        branch 'main'
+        branch 'dev'
       }
       steps {
         sh './gradlew release'
