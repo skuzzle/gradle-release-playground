@@ -20,11 +20,6 @@ githubRelease {
     })
 }
 
-tasks.named("githubRelease") {
-    doFirst {
-        "git checkout main".execute()
-    }
-}
 
 tasks.register("Commit files") {
     dependsOn(":readme:generateReadmeAndReleaseNotes")
