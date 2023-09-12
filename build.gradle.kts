@@ -6,18 +6,12 @@ plugins {
 }
 
 scmVersion {
-    versionCreator("versionWithBranch")
-}
-
-allprojects {
-//    project.version = scmVersion.version
+    versionCreator("simple")
 }
 
 
 
-/*project.version = scmVersion.version
-
-release {
+/*release {
     pushReleaseVersionBranch = "main"
     tagTemplate = "v$version"
     git {
@@ -25,9 +19,3 @@ release {
     }
 }*/
 
-
-/*tasks.register("Commit files") {
-    dependsOn(":readme:generateReadmeAndReleaseNotes")
-    "git add README.md RELEASE_NOTES.md".execute()
-    "git commit -m \"Update README and Release notes\"".execute()
-}*/
