@@ -20,3 +20,4 @@ tasks.register("generateReadmeAndReleaseNotes") {
         }
     }
 }
+println("Version in ${project.name}: ${project.version}")

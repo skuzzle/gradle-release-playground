@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("gradle-plugin"))
+    implementation(libs.semanticVersion)
     implementation(libs.gradle.spotless)
     implementation(libs.gradle.commonCustomUserData)
     implementation(libs.gradle.enterprise)
