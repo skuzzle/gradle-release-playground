@@ -81,13 +81,11 @@ fun git(vararg args: String): String {
     return output
 }
 
-
-val releaseTask by tasks.creating(ReleaseTask::class.java) {
+val prepareRelease by tasks.creating(PrepareReleaseTask::class.java) {
     description = "Releasesesese"
     group = "release"
     this.gitExtension = project.the<GitExtension>()
 }
-
 
 // Classic Release Workflow
 // - Ensure we're on dev branch
