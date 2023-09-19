@@ -68,19 +68,23 @@ val checkCleanWorkingCopy by tasks.creating(DefaultTask::class.java) {
 }
 
 val beforeReleaseHook by tasks.creating(DefaultTask::class.java) {
+    outputs.upToDateWhen { false }
     mustRunAfter(checkCleanWorkingCopy)
 }
 
 val releaseInternal by tasks.creating(ReleaseInternalTask::class.java) {
+    outputs.upToDateWhen { false }
     dependsOn(beforeReleaseHook, checkCleanWorkingCopy)
     this.gitExtension = rootProject.the<GitExtension>()
 }
 
 val afterReleaseHook by tasks.creating(DefaultTask::class.java) {
+    outputs.upToDateWhen { false }
     mustRunAfter(releaseInternal)
 }
 
 val finalizeRelease by tasks.creating(FinalizeReleaseTask::class.java) {
+    outputs.upToDateWhen { false }
     mustRunAfter(releaseInternal)
 }
 

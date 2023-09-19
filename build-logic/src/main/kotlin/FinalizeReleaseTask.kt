@@ -19,8 +19,9 @@ abstract class FinalizeReleaseTask : DefaultTask() {
         git("push")
         println("Pushing release tag")
         git("push", "--tags")
-        println("Pushing dev branch")
+        println("Switching to dev branch")
         git("checkout", "dev")
+        println("Pushing dev branch")
         git("push")
     }
 
