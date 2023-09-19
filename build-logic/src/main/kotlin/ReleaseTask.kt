@@ -33,7 +33,7 @@ abstract class ReleaseTask : DefaultTask() {
         git("pull")
         git("checkout", "main")
 
-        val releaseVersion = gitExtension.currentVersion
+        val releaseVersion = gitExtension.currentVersion.get()
         val releaseBranchName = "release-$releaseVersion"
         logger.info("Creating release branch: $releaseBranchName")
         git("checkout", "-b", releaseBranchName)
