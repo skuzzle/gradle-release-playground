@@ -28,7 +28,6 @@ abstract class PrepareReleaseTask : DefaultTask() {
         if (!gitExtension.cleanWorkingCopy.get()) {
             throw IllegalStateException("Can not release because working copy is not clean")
         }
-
     }
 
     fun git(vararg args: String): String {

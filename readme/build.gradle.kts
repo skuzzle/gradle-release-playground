@@ -1,6 +1,7 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 tasks.register("generateReadmeAndReleaseNotes") {
+    notCompatibleWithConfigurationCache("Not yet")
     group = "release-relevant"
     description = "Copies the readme and release notes file into the root directory, replacing all placeholders"
 

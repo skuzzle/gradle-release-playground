@@ -33,22 +33,21 @@ val pversion = rootProject.property("version")?.toString()
 
 rootProject.allprojects { this.version = determineVersion() }
 
-/*val gitExtension = extensions.create<GitExtension>(GitExtension.NAME).apply {
+val gitExtension = extensions.create<GitExtension>(GitExtension.NAME).apply {
     latestReleaseTag.set(latestTagValue)
     commitHash.set(latestTagHash)
     commitHashShort.set(latestTagHash.substring(0, 8))
     cleanWorkingCopy.set(git("status", "--porcelain").isEmpty())
     currentBranch.set(git("rev-parse", "--abbrev-ref", "HEAD"))
     //unpushedCommits.set(git("cherry", "-v").isNotEmpty())
-}*/
+}
 
 
 fun determineVersion(): String {
-    val pversion = rootProject.property("version")?.toString()
-    if (pversion != null && pversion != "unspecified") {
+    val pversion = rootProject.findProperty("releaseVersion")?.toString()
+    if (pversion != null) {
         return pversion.toString()
     }
-    println(pversion)
     return Version.parseVersion(latestVersion).nextPatch("$branch-SNAPSHOT").toString()
 }
 
@@ -62,30 +61,13 @@ fun git(vararg args: String): String {
 }
 
 
-/*GradleConnector
-    .newConnector()
-    .useBuildDistribution()
-    .forProjectDirectory(layout.projectDirectory.asFile)
-    .connect()
-    .use { projectConnection ->
-        val buildLauncher = projectConnection
-            .newBuild()
-            .forTasks(release)
-            .setStandardInput(System.`in`)
-            .setStandardOutput(System.out)
-            .setStandardError(System.err)
-
-        buildLauncher.run()
-    }*/
-
-
 val beforeReleaseHook by tasks.creating(DefaultTask::class.java) {
-    //mustRunAfter(prepareRelease)
+
 }
 
-val release by tasks.creating(DefaultTask::class.java) {
+val release by tasks.creating(ReleaseTask::class.java) {
     dependsOn(beforeReleaseHook)
-    require(project.property("version") != null) { "No -Pversion=x.y.z parameter specified for release " }
+    this.gitExtension = rootProject.the<GitExtension>()
 }
 
 // On dev, last release: 0.18.0

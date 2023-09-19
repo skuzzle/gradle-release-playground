@@ -4,3 +4,7 @@ plugins {
 }
 
 println("Version in ${project.name}: ${project.version}")
+
+tasks.named("beforeReleaseHook").configure {
+    dependsOn(":readme:generateReadmeAndReleaseNotes", ":hello-world:publishToMavenLocal")
+}
