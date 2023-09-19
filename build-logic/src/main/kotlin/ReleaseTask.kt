@@ -24,19 +24,28 @@ abstract class ReleaseTask : DefaultTask() {
             throw IllegalStateException("Can not release: $releaseVersion is not a valid semantic version: ${parseError.message}")
         }
 
-        val gitInfo = gitExtension.get()
-        if (!gitInfo.cleanWorkingCopy.get()) {
-            throw IllegalStateException("Can not release: working copy is not clean")
+        val status = status()
+        if (!status.isEmpty()) {
+            throw IllegalStateException("Can not release: working copy is not clean: \n$status")
         }
 
-        println("Releasing $releaseVersion from branch ${gitInfo.currentBranch.get()}")
+        val branch = currentBranch()
+        println("Releasing $releaseVersion from branch ${branch}")
     }
 
-    fun tryParseVersion(v : String) : Exception? {
+    fun status(): String {
+        return git("status", "--porcelain")
+    }
+
+    fun currentBranch(): String {
+        return git("rev-parse", "--abbrev-ref", "HEAD")
+    }
+
+    fun tryParseVersion(v: String): Exception? {
         try {
             Version.parseVersion(v)
             return null
-        } catch (e : Exception) {
+        } catch (e: Exception) {
             return e
         }
     }
@@ -46,7 +55,7 @@ abstract class ReleaseTask : DefaultTask() {
         val exec = providerFactory.exec { this.commandLine(fullArgs) }
         val output = exec.standardOutput.asText.get().trim()
 
-        println("\$ ${fullArgs.joinToString(" ")}: $output")
+        //println("\$ ${fullArgs.joinToString(" ")}: $output")
         return output
     }
 }
