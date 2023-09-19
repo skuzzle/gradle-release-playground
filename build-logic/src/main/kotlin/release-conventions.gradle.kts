@@ -66,7 +66,7 @@ fun decorateVersion(calculatedVersion: Version, version: GitExtension): Version 
     val branch = version.currentBranch.get()
     if (branch.equals("dev")) {
         return calculatedVersion.withPreRelease("SNAPSHOT")
-    } else if (!version.currentBranch.equals("main")) {
+    } else if (!branch.equals("main")) {
         return calculatedVersion.withPreRelease("$branch-SNAPSHOT")
     }
     return calculatedVersion
@@ -86,6 +86,14 @@ val prepareRelease by tasks.creating(PrepareReleaseTask::class.java) {
     group = "release"
     this.gitExtension = project.the<GitExtension>()
 }
+
+val currentVersion by tasks.creating(DefaultTask::class.java) {
+    val exti = project.the<GitExtension>()
+    doLast {
+        println(exti.currentVersion.get())
+    }
+}
+
 
 // Classic Release Workflow
 // - Ensure we're on dev branch
