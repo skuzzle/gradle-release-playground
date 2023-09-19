@@ -19,7 +19,7 @@ abstract class PrepareReleaseTask : DefaultTask() {
     @TaskAction
     fun prepareRelease() {
         val gitExtension = gitExtension.get()
-        val releaseVersion = versionExtension.map { it.nextReleaseVersion }.get()
+        val releaseVersion = versionExtension.flatMap { it.nextReleaseVersion }.get()
         val branch = gitExtension.currentBranch.get()
         val releaseBranchName = "release-$releaseVersion"
 
