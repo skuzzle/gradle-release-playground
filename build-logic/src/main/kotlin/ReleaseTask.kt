@@ -35,8 +35,8 @@ abstract class ReleaseTask : DefaultTask() {
         git("tag", "-a", "v${releaseVersion}", "-m", "Release $releaseVersion")
 
         println("Merging release into main branch")
-        git("checkout main")
-        git("merge", "dev")
+        git("checkout", "main")
+        git("merge", "v${releaseVersion}")
     }
 
     fun status(): String {
