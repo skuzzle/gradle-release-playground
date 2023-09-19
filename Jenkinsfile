@@ -11,7 +11,7 @@ pipeline {
     GIT_ASKPASS='./.git-askpass'
   }
   parameters {
-    string(name: 'RELEASE_VERSION', defaultValue: '', description: 'Version to be released') }
+    string(name: 'RELEASE_VERSION', defaultValue: '', description: 'Version to be released')
     booleanParam(name: 'PUBLISH_GITHUB', defaultValue: true, description: 'Whether to publish a GitHub release')
     booleanParam(name: 'RELEASE_DRY_RUN', defaultValue: false, description: 'Whether to push releases to GitHub')
   }
