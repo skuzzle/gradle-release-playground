@@ -43,21 +43,18 @@ val gitExtension = extensions.create<GitExtension>(GitExtension.NAME).apply {
     //unpushedCommits.set(git("cherry", "-v").isNotEmpty())
 }
 
-val versionExtension = extensions.create<VersionExtension>(VersionExtension.NAME)
+val versionExtension = extensions.create<VersionExtension>(VersionExtension.NAME).apply {
+    val calculatedVersion = incrementVersion(gitExtension, releaseExtension)
+    val decoratedVersion = decorateVersion(calculatedVersion, gitExtension, releaseExtension)
 
-val latestRelease = Version.parseVersion(version)
-val calculatedVersion = incrementVersion(gitExtension, releaseExtension)
-val decoratedVersion = decorateVersion(calculatedVersion, gitExtension, releaseExtension)
-
-versionExtension.apply {
-    latestReleaseVersion.set(latestRelease)
+    latestReleaseVersion.set(Version.parseVersion(version))
     developmentVersion.set(decoratedVersion)
     nextReleaseVersion.set(decoratedVersion.toStable())
 }
 
-println(gitExtension)
-
-rootProject.allprojects { this.version = versionExtension.developmentVersion.get().toString() }
+afterEvaluate {
+    rootProject.allprojects { this.version = versionExtension.developmentVersion.get().toString() }
+}
 
 fun incrementVersion(gitExt: GitExtension, releaseExtension: ReleaseExtension): Version {
     val tag = gitExt.latestReleaseTag.get()
@@ -70,7 +67,11 @@ fun incrementVersion(gitExt: GitExtension, releaseExtension: ReleaseExtension): 
     }
 }
 
-fun decorateVersion(calculatedVersion: Version, gitExtension: GitExtension, releaseExtension: ReleaseExtension): Version {
+fun decorateVersion(
+    calculatedVersion: Version,
+    gitExtension: GitExtension,
+    releaseExtension: ReleaseExtension
+): Version {
     val branch = gitExtension.currentBranch.get()
     val isReleaseBranch = releaseExtension.releaseBranches.get().contains(branch)
     val snapshot = !releaseExtension.releaseRequested.get() || !isReleaseBranch
@@ -98,7 +99,6 @@ val prepareRelease by tasks.creating(PrepareReleaseTask::class.java) {
     group = "release"
     this.gitExtension = project.the<GitExtension>()
     this.versionExtension = project.the<VersionExtension>()
-
 }
 
 /*GradleConnector
@@ -148,8 +148,10 @@ val release by tasks.creating(DefaultTask::class.java) {
 
 val releaseMinor by tasks.creating(DefaultTask::class.java) {
     dependsOn(prepareRelease, beforeReleaseHook, currentVersion)
-    releaseExtension.incrementVersionPart = VersionIncrement.MINOR
-    releaseExtension.releaseRequested = true
+    val exti = project.the<ReleaseExtension>()
+
+    exti.incrementVersionPart = VersionIncrement.MINOR
+    exti.releaseRequested = true
 }
 
 // On dev, last release: 0.18.0
