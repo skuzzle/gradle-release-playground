@@ -21,8 +21,9 @@ abstract class PrepareReleaseTask : DefaultTask() {
         val gitExtension = gitExtension.get()
         val releaseVersion = versionExtension.map { it.nextReleaseVersion }.get()
         val branch = gitExtension.currentBranch.get()
+        val releaseBranchName = "release-$releaseVersion"
 
-        logger.info("Preparing release $releaseVersion from branch ${gitExtension.currentBranch}")
+        logger.info("Preparing release $releaseVersion from branch $branch")
 
         if (!gitExtension.cleanWorkingCopy.get()) {
             throw IllegalStateException("Can not release because working copy is not clean")
@@ -36,7 +37,6 @@ abstract class PrepareReleaseTask : DefaultTask() {
         git("pull")
         git("checkout", branch)
 
-        val releaseBranchName = "release-$releaseVersion"
         logger.info("Creating release branch: $releaseBranchName")
         git("checkout", "-b", releaseBranchName)
     }
