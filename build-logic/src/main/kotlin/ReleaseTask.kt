@@ -3,21 +3,19 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
-import org.gradle.kotlin.dsl.the
 import javax.inject.Inject
 
 abstract class ReleaseTask : DefaultTask() {
 
-    @get:Input
-    abstract val releaseVersion : Property<String>
-
     @get:Inject
     abstract val providerFactory: ProviderFactory
-    @get:Inject
-    abstract val gitExtension : GitExtension
+
+    @get:Input
+    abstract val gitExtension: Property<GitExtension>
 
     @TaskAction
     fun release() {
+        val gitExtension = gitExtension.get()
 
         if (!gitExtension.cleanWorkingCopy.get()) {
             throw IllegalStateException("Can not release because working copy is not clean")
@@ -33,7 +31,7 @@ abstract class ReleaseTask : DefaultTask() {
         git("pull")
         git("checkout", "main")
 
-        val releaseVersion = releaseVersion.get()
+        val releaseVersion = gitExtension.currentVersion
         val releaseBranchName = "release-$releaseVersion"
         logger.info("Creating release branch: $releaseBranchName")
         git("checkout", "-b", releaseBranchName)

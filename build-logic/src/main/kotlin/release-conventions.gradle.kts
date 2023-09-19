@@ -83,7 +83,7 @@ fun git(vararg args: String): String {
 val releaseTask by tasks.creating(ReleaseTask::class.java) {
     description = "Releasesesese"
     group = "release"
-    releaseVersion = gitExtension.currentVersion
+    this.gitExtension = project.the<GitExtension>()
 }
 
 
