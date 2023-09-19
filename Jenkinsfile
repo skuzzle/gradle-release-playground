@@ -8,6 +8,7 @@ pipeline {
   environment {
     GITHUB = credentials('Github-Username-Pw')
     GITHUB_RELEASE_TOKEN = credentials('github_registry_release')
+    ORG_GRADLE_PROJECT_ghToken = credentials('github_registry_release')
     GIT_ASKPASS='./.git-askpass'
   }
   parameters {
@@ -34,7 +35,7 @@ pipeline {
     }
     stage('Release') {
       steps {
-        sh './gradlew release -Pgh_token=${GITHUB_RELEASE_TOKEN} -PreleaseVersion=${RELEASE_VERSION} -i -s'
+        sh './gradlew release -PreleaseVersion=${RELEASE_VERSION}'
       }
     }
   }
