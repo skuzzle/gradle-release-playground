@@ -61,10 +61,7 @@ fun git(vararg args: String): String {
     return output
 }
 
-val checkCleanWorkingCopy by tasks.creating(DefaultTask::class.java) {
-    if (status.isNotEmpty()) {
-        throw IllegalStateException("Can not release: Working copy not clean: \n$status")
-    }
+val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.java) {
 }
 
 val beforeReleaseHook by tasks.creating(DefaultTask::class.java) {

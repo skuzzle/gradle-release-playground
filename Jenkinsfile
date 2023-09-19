@@ -27,11 +27,6 @@ pipeline {
         sh 'git config user.name "Jenkins"'
       }
     }
-    stage('Build') {
-      steps {
-        sh './gradlew build'
-      }
-    }
     stage('Show git status') {
       steps {
         sh 'git status'
