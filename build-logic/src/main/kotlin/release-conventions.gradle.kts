@@ -34,26 +34,35 @@ val releaseExtension = extensions.create<ReleaseExtension>(ReleaseExtension.NAME
 }
 
 val gitExtension = extensions.create<GitExtension>(GitExtension.NAME).apply {
-    latestRelease.set(version)
+    latestReleaseTag.set(latestTagValue)
     commitHash.set(latestTagHash)
     commitHashShort.set(latestTagHash.substring(0, 8))
     cleanWorkingCopy.set(git("status", "--porcelain").isEmpty())
     currentBranch.set(git("rev-parse", "--abbrev-ref", "HEAD"))
-    unpushedCommits.set(git("cherry", "-v").isNotEmpty())
+    //unpushedCommits.set(git("cherry", "-v").isNotEmpty())
 }
 
+val versionExtension = extensions.create<VersionExtension>(VersionExtension.NAME)
+
+val latestRelease = Version.parseVersion(version)
 val calculatedVersion = incrementVersion(gitExtension)
 val decoratedVersion = decorateVersion(calculatedVersion, gitExtension)
 
-gitExtension.currentVersion.set(decoratedVersion.toString())
+versionExtension.apply {
+    latestReleaseVersion.set(latestRelease)
+    developmentVersion.set(decoratedVersion)
+    nextReleaseVersion.set(decoratedVersion.toStable())
+}
+
 println(gitExtension)
 
 //git("checkout", "-b", "release-$version")
 
-rootProject.allprojects { this.version = gitExtension.currentVersion.get().toString() }
+rootProject.allprojects { this.version = versionExtension.developmentVersion.get().toString() }
 
-fun incrementVersion(versionExtension: GitExtension): Version {
-    val parsedVersion = Version.parseVersion(versionExtension.latestRelease.get())
+fun incrementVersion(gitExt: GitExtension): Version {
+    val tag = gitExt.latestReleaseTag.get()
+    val parsedVersion = Version.parseVersion(tag.substring(1))
 
     when (releaseExtension.incrementVersionPart.get()) {
         VersionIncrement.MAJOR -> return parsedVersion.nextMajor()
@@ -66,10 +75,10 @@ fun decorateVersion(calculatedVersion: Version, version: GitExtension): Version 
     val branch = version.currentBranch.get()
     if (branch.equals("dev")) {
         return calculatedVersion.withPreRelease("SNAPSHOT")
-    } else if (!branch.equals("main")) {
-        return calculatedVersion.withPreRelease("$branch-SNAPSHOT")
+    } else if (branch.equals("main") || branch.startsWith("release")) {
+        return calculatedVersion
     }
-    return calculatedVersion
+    return calculatedVersion.withPreRelease("$branch-SNAPSHOT")
 }
 
 fun git(vararg args: String): String {
@@ -85,15 +94,38 @@ val prepareRelease by tasks.creating(PrepareReleaseTask::class.java) {
     description = "Releasesesese"
     group = "release"
     this.gitExtension = project.the<GitExtension>()
+    this.versionExtension = project.the<VersionExtension>()
+
 }
 
 val currentVersion by tasks.creating(DefaultTask::class.java) {
-    val exti = project.the<GitExtension>()
+    val exti = project.the<VersionExtension>()
     doLast {
-        println(exti.currentVersion.get())
+        println(exti.developmentVersion.get())
     }
 }
 
+val lastReleasedVersion by tasks.creating(DefaultTask::class.java) {
+    val exti = project.the<VersionExtension>()
+    doLast {
+        println(exti.latestReleaseVersion.get())
+    }
+}
+
+val nextReleaseVersion by tasks.creating(DefaultTask::class.java) {
+    val exti = project.the<VersionExtension>()
+    doLast {
+        println(exti.nextReleaseVersion.get())
+    }
+}
+
+val beforeReleaseHook by tasks.creating(DefaultTask::class.java) {
+    mustRunAfter(prepareRelease)
+}
+
+val release by tasks.creating(DefaultTask::class.java) {
+    dependsOn(prepareRelease, beforeReleaseHook)
+}
 
 
 // Classic Release Workflow

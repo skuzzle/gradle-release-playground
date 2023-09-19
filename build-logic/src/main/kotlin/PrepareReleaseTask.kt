@@ -13,14 +13,19 @@ abstract class PrepareReleaseTask : DefaultTask() {
     @get:Input
     abstract val gitExtension: Property<GitExtension>
 
+    @get:Input
+    abstract val versionExtension: Property<VersionExtension>
+
     @TaskAction
-    fun release() {
+    fun prepareRelease() {
         val gitExtension = gitExtension.get()
+        val releaseVersion = versionExtension.map { it.nextReleaseVersion }.get()
+        val branch = gitExtension.currentBranch.get()
+
+        logger.info("Preparing release $releaseVersion from branch ${gitExtension.currentBranch}")
 
         if (!gitExtension.cleanWorkingCopy.get()) {
             throw IllegalStateException("Can not release because working copy is not clean")
-        } else if (gitExtension.unpushedCommits.get()) {
-            throw IllegalStateException("Can not release because current branch is ahead of its upstream branch")
         }
 
         logger.info("Fetching latest changes")
@@ -29,18 +34,11 @@ abstract class PrepareReleaseTask : DefaultTask() {
         git("checkout", "main")
         logger.info("Pulling latest changes")
         git("pull")
-        git("checkout", "dev")
-        git("pull")
-        git("checkout", "main")
+        git("checkout", branch)
 
-        val releaseVersion = gitExtension.currentVersion.get()
         val releaseBranchName = "release-$releaseVersion"
         logger.info("Creating release branch: $releaseBranchName")
         git("checkout", "-b", releaseBranchName)
-
-        logger.info("Merging dev to release")
-        git("merge", "dev")
-
     }
 
     fun git(vararg args: String): String {

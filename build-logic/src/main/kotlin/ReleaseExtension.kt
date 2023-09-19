@@ -3,7 +3,7 @@ import org.gradle.api.provider.SetProperty
 
 abstract class ReleaseExtension {
     companion object {
-        val NAME = "ReleaseExtension"
+        const val NAME = "ReleaseExtension"
     }
 
     /** Regex of branch names that are considered to be release branches */

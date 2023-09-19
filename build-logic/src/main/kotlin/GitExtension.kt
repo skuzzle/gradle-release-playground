@@ -1,12 +1,12 @@
+import de.skuzzle.semantic.Version
 import org.gradle.api.provider.Property
 
 abstract class GitExtension {
     companion object {
-        val NAME = "GitExtension"
+        const val NAME = "GitExtension"
     }
 
-    abstract val latestRelease : Property<String>
-    abstract val currentVersion: Property<String>
+    abstract val latestReleaseTag : Property<String>
     abstract val currentBranch: Property<String>
     abstract val commitHash: Property<String>
     abstract val commitHashShort: Property<String>
@@ -14,13 +14,12 @@ abstract class GitExtension {
     abstract val unpushedCommits :Property<Boolean>
 
     override fun toString(): String {
-        return "VersionExtension(" +
-            "latestRelease=${latestRelease.orNull}, " +
-            "currentVersion=${currentVersion.orNull}, " +
+        return "$NAME(" +
+            "latestReleaseTag=${latestReleaseTag.orNull}, " +
             "currentBranch=${currentBranch.orNull}, " +
             "commitHash=${commitHash.orNull}, " +
             "commitHashShort=${commitHashShort.orNull}, " +
-            "cleanWorkingCopy=${cleanWorkingCopy.orNull}), "+
+            "cleanWorkingCopy=${cleanWorkingCopy.orNull}, "+
             "unpushedCommits=${unpushedCommits.orNull})"
     }
 
