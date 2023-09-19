@@ -13,7 +13,6 @@ tasks.named("afterReleaseHook").configure {
     dependsOn(":githubRelease")
 }
 
-
 githubRelease {
     token(provider { property("ghToken") as String? })
     owner.set(property("githubUser").toString())
