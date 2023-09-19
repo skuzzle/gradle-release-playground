@@ -24,11 +24,6 @@ abstract class ReleaseTask : DefaultTask() {
             throw IllegalStateException("Can not release: $releaseVersion is not a valid semantic version: ${parseError.message}")
         }
 
-        val status = status()
-        if (!status.isEmpty()) {
-            throw IllegalStateException("Can not release: working copy is not clean: \n$status")
-        }
-
         val branch = currentBranch()
         println("Releasing $releaseVersion from branch ${branch}")
     }

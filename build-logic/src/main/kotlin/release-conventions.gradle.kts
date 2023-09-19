@@ -29,6 +29,7 @@ val latestTagValue = git("describe", "--tags", latestTagHash, "--match=v[0-9]*")
 val latestVersion = latestTagValue.substring(1)
 val branch = git("rev-parse", "--abbrev-ref", "HEAD")
 val pversion = rootProject.property("version")?.toString()
+val status = git("status", "--porcelain")
 
 
 rootProject.allprojects { this.version = determineVersion() }
@@ -60,13 +61,18 @@ fun git(vararg args: String): String {
     return output
 }
 
+val checkCleanWorkingCopy by tasks.creating(DefaultTask::class.java) {
+    if (status.isNotEmpty()) {
+        throw IllegalStateException("Can not release: Working copy not clean: \n$status")
+    }
+}
 
 val beforeReleaseHook by tasks.creating(DefaultTask::class.java) {
-
+    mustRunAfter(checkCleanWorkingCopy)
 }
 
 val release by tasks.creating(ReleaseTask::class.java) {
-    dependsOn(beforeReleaseHook)
+    dependsOn(beforeReleaseHook, checkCleanWorkingCopy)
     this.gitExtension = rootProject.the<GitExtension>()
 }
 
