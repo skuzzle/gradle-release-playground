@@ -1,1 +1,1 @@
-Release notes for 1.2.6
+Release notes for 1.2.7
