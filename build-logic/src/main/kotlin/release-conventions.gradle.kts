@@ -44,16 +44,22 @@ val gitExtension = extensions.create<GitExtension>(GitExtension.NAME).apply {
 }
 
 val versionExtension = extensions.create<VersionExtension>(VersionExtension.NAME).apply {
+    updateVersionExtension(this)
+}
+
+
+
+rootProject.allprojects { this.version = versionExtension.developmentVersion.get().toString() }
+
+fun updateVersionExtension(versionExtension: VersionExtension) {
     val calculatedVersion = incrementVersion(gitExtension, releaseExtension)
     val decoratedVersion = decorateVersion(calculatedVersion, gitExtension, releaseExtension)
 
-    latestReleaseVersion.set(Version.parseVersion(version))
-    developmentVersion.set(decoratedVersion)
-    nextReleaseVersion.set(decoratedVersion.toStable())
-}
-
-afterEvaluate {
-    rootProject.allprojects { this.version = versionExtension.developmentVersion.get().toString() }
+    versionExtension.apply {
+        latestReleaseVersion.set(Version.parseVersion(version))
+        developmentVersion.set(decoratedVersion)
+        nextReleaseVersion.set(decoratedVersion.toStable())
+    }
 }
 
 fun incrementVersion(gitExt: GitExtension, releaseExtension: ReleaseExtension): Version {
@@ -148,10 +154,12 @@ val release by tasks.creating(DefaultTask::class.java) {
 
 val releaseMinor by tasks.creating(DefaultTask::class.java) {
     dependsOn(prepareRelease, beforeReleaseHook, currentVersion)
+    val vexti = project.the<VersionExtension>()
     val exti = project.the<ReleaseExtension>()
 
     exti.incrementVersionPart = VersionIncrement.MINOR
     exti.releaseRequested = true
+    updateVersionExtension(vexti)
 }
 
 // On dev, last release: 0.18.0
