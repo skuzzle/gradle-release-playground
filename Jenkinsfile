@@ -10,6 +10,11 @@ pipeline {
     GITHUB_RELEASE_TOKEN = credentials('github_registry_release')
     GIT_ASKPASS='./.git-askpass'
   }
+  parameters {
+    string(name: 'RELEASE_VERSION', defaultValue: '', description: 'Version to be released') }
+    booleanParam(name: 'PUBLISH_GITHUB', defaultValue: true, description: 'Whether to publish a GitHub release')
+    booleanParam(name: 'RELEASE_DRY_RUN', defaultValue: false, description: 'Whether to push releases to GitHub')
+  }
   stages {
     stage ('Set Git Information') {
       steps {
@@ -34,13 +39,7 @@ pipeline {
     }
     stage('Release') {
       steps {
-        sh './gradlew release'
-      }
-    }
-    stage('Release GitHub') {
-      steps {
-        sh 'git checkout main'
-        sh './gradlew githubRelease -Pgh_token=${GITHUB_RELEASE_TOKEN}'
+        sh './gradlew release -Pgh_token=${GITHUB_RELEASE_TOKEN} -PreleaseVersion=${RELEASE_VERSION}'
       }
     }
   }

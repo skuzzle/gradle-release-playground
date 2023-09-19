@@ -6,7 +6,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
-abstract class ReleaseTask : DefaultTask() {
+abstract class ReleaseInternalTask : DefaultTask() {
 
     @get:Inject
     abstract val providerFactory: ProviderFactory

@@ -71,7 +71,7 @@ val beforeReleaseHook by tasks.creating(DefaultTask::class.java) {
     mustRunAfter(checkCleanWorkingCopy)
 }
 
-val releaseInternal by tasks.creating(ReleaseTask::class.java) {
+val releaseInternal by tasks.creating(ReleaseInternalTask::class.java) {
     dependsOn(beforeReleaseHook, checkCleanWorkingCopy)
     this.gitExtension = rootProject.the<GitExtension>()
 }
@@ -80,8 +80,12 @@ val afterReleaseHook by tasks.creating(DefaultTask::class.java) {
     mustRunAfter(releaseInternal)
 }
 
+val finalizeRelease by tasks.creating(FinalizeReleaseTask::class.java) {
+    mustRunAfter(releaseInternal)
+}
+
 val release by tasks.creating(DefaultTask::class.java) {
-    dependsOn(beforeReleaseHook, releaseInternal, afterReleaseHook)
+    dependsOn(beforeReleaseHook, releaseInternal, afterReleaseHook, finalizeRelease)
 }
 
 // On dev, last release: 0.18.0
