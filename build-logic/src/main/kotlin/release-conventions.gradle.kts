@@ -26,70 +26,30 @@ import de.skuzzle.semantic.Version
 
 val latestTagHash = git("rev-list", "--tags", "--max-count=1")
 val latestTagValue = git("describe", "--tags", latestTagHash, "--match=v[0-9]*")
-val version = latestTagValue.substring(1)
+val latestVersion = latestTagValue.substring(1)
+val branch = git("rev-parse", "--abbrev-ref", "HEAD")
+val pversion = rootProject.property("version")?.toString()
 
-val releaseExtension = extensions.create<ReleaseExtension>(ReleaseExtension.NAME).apply {
-    releaseBranches.convention(setOf("dev"))
-    releaseRequested.convention(false)
-    incrementVersionPart.convention(VersionIncrement.PATCH)
-}
 
-val gitExtension = extensions.create<GitExtension>(GitExtension.NAME).apply {
+rootProject.allprojects { this.version = determineVersion() }
+
+/*val gitExtension = extensions.create<GitExtension>(GitExtension.NAME).apply {
     latestReleaseTag.set(latestTagValue)
     commitHash.set(latestTagHash)
     commitHashShort.set(latestTagHash.substring(0, 8))
     cleanWorkingCopy.set(git("status", "--porcelain").isEmpty())
     currentBranch.set(git("rev-parse", "--abbrev-ref", "HEAD"))
     //unpushedCommits.set(git("cherry", "-v").isNotEmpty())
-}
-
-val versionExtension = extensions.create<VersionExtension>(VersionExtension.NAME).apply {
-    val ve = this
-    updateVersionExtension(this)
-    rootProject.allprojects { this.version = ve.developmentVersion.get().toString() }
-}
+}*/
 
 
-
-
-fun updateVersionExtension(versionExtension: VersionExtension) {
-    val calculatedVersion = incrementVersion(gitExtension, releaseExtension)
-    val decoratedVersion = decorateVersion(calculatedVersion, gitExtension, releaseExtension)
-
-    versionExtension.apply {
-        latestReleaseVersion.set(Version.parseVersion(version))
-        developmentVersion.set(decoratedVersion)
-        nextReleaseVersion.set(decoratedVersion.toStable())
+fun determineVersion(): String {
+    val pversion = rootProject.property("version")?.toString()
+    if (pversion != null && pversion != "unspecified") {
+        return pversion.toString()
     }
-}
-
-fun incrementVersion(gitExt: GitExtension, releaseExtension: ReleaseExtension): Version {
-    val tag = gitExt.latestReleaseTag.get()
-    val parsedVersion = Version.parseVersion(tag.substring(1))
-
-    when (releaseExtension.incrementVersionPart.get()) {
-        VersionIncrement.MAJOR -> return parsedVersion.nextMajor()
-        VersionIncrement.MINOR -> return parsedVersion.nextMinor()
-        VersionIncrement.PATCH -> return parsedVersion.nextPatch()
-    }
-}
-
-fun decorateVersion(
-    calculatedVersion: Version,
-    gitExtension: GitExtension,
-    releaseExtension: ReleaseExtension
-): Version {
-    val branch = gitExtension.currentBranch.get()
-    val isReleaseBranch = releaseExtension.releaseBranches.get().contains(branch)
-    val snapshot = !releaseExtension.releaseRequested.get() || !isReleaseBranch
-
-    println(releaseExtension)
-
-    var preRelease = if (snapshot) "SNAPSHOT" else ""
-    if (!isReleaseBranch) {
-        preRelease = "$branch-SNAPSHOT"
-    }
-    return calculatedVersion.withPreRelease(preRelease)
+    println(pversion)
+    return Version.parseVersion(latestVersion).nextPatch("$branch-SNAPSHOT").toString()
 }
 
 fun git(vararg args: String): String {
@@ -101,12 +61,6 @@ fun git(vararg args: String): String {
     return output
 }
 
-val prepareRelease by tasks.creating(PrepareReleaseTask::class.java) {
-    description = "Releasesesese"
-    group = "release"
-    this.gitExtension = project.the<GitExtension>()
-    this.versionExtension = project.the<VersionExtension>()
-}
 
 /*GradleConnector
     .newConnector()
@@ -124,43 +78,14 @@ val prepareRelease by tasks.creating(PrepareReleaseTask::class.java) {
         buildLauncher.run()
     }*/
 
-val currentVersion by tasks.creating(DefaultTask::class.java) {
-    val exti = project.the<VersionExtension>()
-    doLast {
-        println(exti.developmentVersion.get())
-    }
-}
-
-val lastReleasedVersion by tasks.creating(DefaultTask::class.java) {
-    val exti = project.the<VersionExtension>()
-    doLast {
-        println(exti.latestReleaseVersion.get())
-    }
-}
-
-val nextReleaseVersion by tasks.creating(DefaultTask::class.java) {
-    val exti = project.the<VersionExtension>()
-    doLast {
-        println(exti.nextReleaseVersion.get())
-    }
-}
 
 val beforeReleaseHook by tasks.creating(DefaultTask::class.java) {
-    mustRunAfter(prepareRelease)
+    //mustRunAfter(prepareRelease)
 }
 
 val release by tasks.creating(DefaultTask::class.java) {
-    dependsOn(prepareRelease, beforeReleaseHook)
-}
-
-val releaseMinor by tasks.creating(DefaultTask::class.java) {
-    dependsOn(prepareRelease, beforeReleaseHook, currentVersion)
-    val vexti = project.the<VersionExtension>()
-    val exti = project.the<ReleaseExtension>()
-
-    exti.incrementVersionPart = VersionIncrement.MINOR
-    exti.releaseRequested = true
-    updateVersionExtension(vexti)
+    dependsOn(beforeReleaseHook)
+    require(project.property("version") != null) { "No -Pversion=x.y.z parameter specified for release " }
 }
 
 // On dev, last release: 0.18.0
