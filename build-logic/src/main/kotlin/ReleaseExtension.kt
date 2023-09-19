@@ -6,11 +6,16 @@ abstract class ReleaseExtension {
         const val NAME = "ReleaseExtension"
     }
 
-    /** Regex of branch names that are considered to be release branches */
-    abstract val releaseBranches: SetProperty<String>
-
-    /** Whether release should fail when working copy is not clean */
-    abstract val requireCleanWorkingCopy: Property<Boolean>
+    abstract val releaseBranches : SetProperty<String>
+    abstract val releaseRequested : Property<Boolean>
 
     abstract val incrementVersionPart : Property<VersionIncrement>
+    override fun toString(): String {
+        return "ReleaseExtension(" +
+            "releaseBranches=${releaseBranches.orNull}, " +
+            "releaseRequested=${releaseRequested.orNull}, " +
+            "incrementVersionPart=${incrementVersionPart.orNull})"
+    }
+
+
 }

@@ -29,7 +29,8 @@ val latestTagValue = git("describe", "--tags", latestTagHash, "--match=v[0-9]*")
 val version = latestTagValue.substring(1)
 
 val releaseExtension = extensions.create<ReleaseExtension>(ReleaseExtension.NAME).apply {
-    releaseBranches.convention(setOf("main"))
+    releaseBranches.convention(setOf("dev"))
+    releaseRequested.convention(false)
     incrementVersionPart.convention(VersionIncrement.PATCH)
 }
 
@@ -45,8 +46,8 @@ val gitExtension = extensions.create<GitExtension>(GitExtension.NAME).apply {
 val versionExtension = extensions.create<VersionExtension>(VersionExtension.NAME)
 
 val latestRelease = Version.parseVersion(version)
-val calculatedVersion = incrementVersion(gitExtension)
-val decoratedVersion = decorateVersion(calculatedVersion, gitExtension)
+val calculatedVersion = incrementVersion(gitExtension, releaseExtension)
+val decoratedVersion = decorateVersion(calculatedVersion, gitExtension, releaseExtension)
 
 versionExtension.apply {
     latestReleaseVersion.set(latestRelease)
@@ -56,11 +57,9 @@ versionExtension.apply {
 
 println(gitExtension)
 
-//git("checkout", "-b", "release-$version")
-
 rootProject.allprojects { this.version = versionExtension.developmentVersion.get().toString() }
 
-fun incrementVersion(gitExt: GitExtension): Version {
+fun incrementVersion(gitExt: GitExtension, releaseExtension: ReleaseExtension): Version {
     val tag = gitExt.latestReleaseTag.get()
     val parsedVersion = Version.parseVersion(tag.substring(1))
 
@@ -71,14 +70,18 @@ fun incrementVersion(gitExt: GitExtension): Version {
     }
 }
 
-fun decorateVersion(calculatedVersion: Version, version: GitExtension): Version {
-    val branch = version.currentBranch.get()
-    if (branch.equals("dev")) {
-        return calculatedVersion.withPreRelease("SNAPSHOT")
-    } else if (branch.equals("main") || branch.startsWith("release")) {
-        return calculatedVersion
+fun decorateVersion(calculatedVersion: Version, gitExtension: GitExtension, releaseExtension: ReleaseExtension): Version {
+    val branch = gitExtension.currentBranch.get()
+    val isReleaseBranch = releaseExtension.releaseBranches.get().contains(branch)
+    val snapshot = !releaseExtension.releaseRequested.get() || !isReleaseBranch
+
+    println(releaseExtension)
+
+    var preRelease = if (snapshot) "SNAPSHOT" else ""
+    if (!isReleaseBranch) {
+        preRelease = "$branch-SNAPSHOT"
     }
-    return calculatedVersion.withPreRelease("$branch-SNAPSHOT")
+    return calculatedVersion.withPreRelease(preRelease)
 }
 
 fun git(vararg args: String): String {
@@ -97,6 +100,22 @@ val prepareRelease by tasks.creating(PrepareReleaseTask::class.java) {
     this.versionExtension = project.the<VersionExtension>()
 
 }
+
+/*GradleConnector
+    .newConnector()
+    .useBuildDistribution()
+    .forProjectDirectory(layout.projectDirectory.asFile)
+    .connect()
+    .use { projectConnection ->
+        val buildLauncher = projectConnection
+            .newBuild()
+            .forTasks(release)
+            .setStandardInput(System.`in`)
+            .setStandardOutput(System.out)
+            .setStandardError(System.err)
+
+        buildLauncher.run()
+    }*/
 
 val currentVersion by tasks.creating(DefaultTask::class.java) {
     val exti = project.the<VersionExtension>()
@@ -127,6 +146,18 @@ val release by tasks.creating(DefaultTask::class.java) {
     dependsOn(prepareRelease, beforeReleaseHook)
 }
 
+val releaseMinor by tasks.creating(DefaultTask::class.java) {
+    dependsOn(prepareRelease, beforeReleaseHook, currentVersion)
+    releaseExtension.incrementVersionPart = VersionIncrement.MINOR
+    releaseExtension.releaseRequested = true
+}
+
+// On dev, last release: 0.18.0
+// $ gw currentVersion
+// 0.19.0-SNAPSHOT
+// $ gw releaseMinor
+// -> 0.19.0
+// ->
 
 // Classic Release Workflow
 // - Ensure we're on dev branch
