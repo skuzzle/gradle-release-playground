@@ -26,6 +26,17 @@ abstract class ReleaseTask : DefaultTask() {
 
         val branch = currentBranch()
         println("Releasing $releaseVersion from branch ${branch}")
+
+        println("Adding files to git:\n${status()}")
+        git("add", ".")
+
+        println("Creating release commit & tag")
+        git("commit", "-m", "Release $releaseVersion")
+        git("tag", "-a", "v${releaseVersion}", "-m", "Release $releaseVersion")
+
+        println("Merging release into main branch")
+        git("checkout main")
+        git("merge", "v${releaseVersion}")
     }
 
     fun status(): String {
