@@ -44,12 +44,13 @@ val gitExtension = extensions.create<GitExtension>(GitExtension.NAME).apply {
 }
 
 val versionExtension = extensions.create<VersionExtension>(VersionExtension.NAME).apply {
+    val ve = this
     updateVersionExtension(this)
+    rootProject.allprojects { this.version = ve.developmentVersion.get().toString() }
 }
 
 
 
-rootProject.allprojects { this.version = versionExtension.developmentVersion.get().toString() }
 
 fun updateVersionExtension(versionExtension: VersionExtension) {
     val calculatedVersion = incrementVersion(gitExtension, releaseExtension)
