@@ -10,7 +10,7 @@ tasks.named("beforeReleaseHook").configure {
 }
 
 tasks.named("afterReleaseHook").configure {
-    dependsOn()
+    dependsOn(":githubRelease")
 }
 
 
