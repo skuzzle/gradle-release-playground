@@ -46,6 +46,7 @@ val afterReleaseHook by tasks.creating(DefaultTask::class.java) {
 
 val finalizeRelease by tasks.creating(FinalizeReleaseTask::class.java) {
     outputs.upToDateWhen { false }
+    onlyIf { providers.gradleProperty("RELEASE_DRY_RUN").orNull == "true" }
     mustRunAfter(releaseInternal)
 }
 
