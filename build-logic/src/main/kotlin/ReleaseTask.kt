@@ -19,6 +19,8 @@ abstract class ReleaseTask : DefaultTask() {
 
         if (!gitExtension.cleanWorkingCopy.get()) {
             throw IllegalStateException("Can not release because working copy is not clean")
+        } else if (gitExtension.unpushedCommits.get()) {
+            throw IllegalStateException("Can not release because current branch is ahead of its upstream branch")
         }
 
         logger.info("Fetching latest changes")

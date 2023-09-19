@@ -11,6 +11,7 @@ abstract class GitExtension {
     abstract val commitHash: Property<String>
     abstract val commitHashShort: Property<String>
     abstract val cleanWorkingCopy: Property<Boolean>
+    abstract val unpushedCommits :Property<Boolean>
 
     override fun toString(): String {
         return "VersionExtension(" +
@@ -19,7 +20,8 @@ abstract class GitExtension {
             "currentBranch=${currentBranch.orNull}, " +
             "commitHash=${commitHash.orNull}, " +
             "commitHashShort=${commitHashShort.orNull}, " +
-            "cleanWorkingCopy=${cleanWorkingCopy.orNull})"
+            "cleanWorkingCopy=${cleanWorkingCopy.orNull}), "+
+            "unpushedCommits=${unpushedCommits.orNull})"
     }
 
 }

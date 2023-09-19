@@ -39,6 +39,7 @@ val gitExtension = extensions.create<GitExtension>(GitExtension.NAME).apply {
     commitHashShort.set(latestTagHash.substring(0, 8))
     cleanWorkingCopy.set(git("status", "--porcelain").isEmpty())
     currentBranch.set(git("rev-parse", "--abbrev-ref", "HEAD"))
+    unpushedCommits.set(git("cherry", "-v").isNotEmpty())
 }
 
 val calculatedVersion = incrementVersion(gitExtension)
@@ -51,7 +52,7 @@ println(gitExtension)
 
 rootProject.allprojects { this.version = gitExtension.currentVersion.get().toString() }
 
-fun incrementVersion(versionExtension: GitExtension) : Version {
+fun incrementVersion(versionExtension: GitExtension): Version {
     val parsedVersion = Version.parseVersion(versionExtension.latestRelease.get())
 
     when (releaseExtension.incrementVersionPart.get()) {
