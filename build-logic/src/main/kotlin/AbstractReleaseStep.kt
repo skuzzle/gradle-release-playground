@@ -26,11 +26,11 @@ abstract class AbstractReleaseStep : DefaultTask() {
         val result = exec.result
             .orNull ?: throw IllegalStateException("No result while running: $command")
 
-        val stdout =  exec.standardOutput.asText.orElse("")
-        val stderr = exec.standardError.asText.orElse("")
+        val stdout =  exec.standardOutput.asText.orElse("").get().trim()
+        val stderr = exec.standardError.asText.orElse("").get().trim()
         val output = "out> $stdout\nerr> $stderr"
         if (result.exitValue != 0) {
-            throw IllegalStateException("Exit value ${result.exitValue} while running $command:\n${exec.standardError.asText.get().trim()}")
+            throw IllegalStateException("Exit value ${result.exitValue} while running $command:\n$output")
         }
 
         println("$command:\n$output")
