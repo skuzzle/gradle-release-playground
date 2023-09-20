@@ -8,11 +8,11 @@ pipeline {
   environment {
     GITHUB = credentials('Github-Username-Pw')
     GITHUB_RELEASE_TOKEN = credentials('github_registry_release')
+    ORG_GRADLE_PROJECT_ghToken = credentials('github_registry_release')
     GIT_ASKPASS='./.git-askpass'
   }
   parameters {
     string(name: 'RELEASE_VERSION', defaultValue: '', description: 'Version to be released')
-    booleanParam(name: 'PUBLISH_GITHUB', defaultValue: true, description: 'Whether to publish a GitHub release')
     booleanParam(name: 'RELEASE_DRY_RUN', defaultValue: false, description: 'Whether to push releases to GitHub')
   }
   stages {
@@ -27,11 +27,6 @@ pipeline {
         sh 'git config user.name "Jenkins"'
       }
     }
-    stage('Build') {
-      steps {
-        sh './gradlew build'
-      }
-    }
     stage('Show git status') {
       steps {
         sh 'git status'
@@ -39,7 +34,7 @@ pipeline {
     }
     stage('Release') {
       steps {
-        sh './gradlew release -Pgh_token=${GITHUB_RELEASE_TOKEN} -PreleaseVersion=${RELEASE_VERSION}'
+        sh './gradlew release -PreleaseVersion=${RELEASE_VERSION}'
       }
     }
   }

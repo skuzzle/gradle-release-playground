@@ -1,18 +1,7 @@
 import de.skuzzle.semantic.Version
-import org.gradle.api.DefaultTask
-import org.gradle.api.provider.Property
-import org.gradle.api.provider.ProviderFactory
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
-import javax.inject.Inject
 
-abstract class ReleaseInternalTask : DefaultTask() {
-
-    @get:Inject
-    abstract val providerFactory: ProviderFactory
-
-    @get:Input
-    abstract val gitExtension: Property<GitExtension>
+abstract class ReleaseInternalTask : AbstractReleaseStep() {
 
     @TaskAction
     fun release() {
@@ -25,7 +14,7 @@ abstract class ReleaseInternalTask : DefaultTask() {
         }
 
         val branch = currentBranch()
-        println("Releasing $releaseVersion from branch ${branch}")
+        println("Releasing $releaseVersion from branch $branch")
 
         println("Adding files to git:\n${status()}")
         git("add", ".")
@@ -39,14 +28,6 @@ abstract class ReleaseInternalTask : DefaultTask() {
         git("merge", "v${releaseVersion}")
     }
 
-    fun status(): String {
-        return git("status", "--porcelain")
-    }
-
-    fun currentBranch(): String {
-        return git("rev-parse", "--abbrev-ref", "HEAD")
-    }
-
     fun tryParseVersion(v: String): Exception? {
         try {
             Version.parseVersion(v)
@@ -54,14 +35,5 @@ abstract class ReleaseInternalTask : DefaultTask() {
         } catch (e: Exception) {
             return e
         }
-    }
-
-    fun git(vararg args: String): String {
-        val fullArgs = listOf("git") + listOf(*args)
-        val exec = providerFactory.exec { this.commandLine(fullArgs) }
-        val output = exec.standardOutput.asText.get().trim()
-
-        //println("\$ ${fullArgs.joinToString(" ")}: $output")
-        return output
     }
 }

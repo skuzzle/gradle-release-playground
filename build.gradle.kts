@@ -10,14 +10,13 @@ tasks.named("beforeReleaseHook").configure {
 }
 
 tasks.named("afterReleaseHook").configure {
-    dependsOn()
+    dependsOn(":githubRelease")
 }
-
 
 githubRelease {
     token(provider { property("ghToken") as String? })
     owner.set(property("githubUser").toString())
     repo.set(property("githubRepo").toString())
     draft.set(true)
-    body(provider { file("RELEASE_NOTES.md").readText(Charsets.UTF_8) })
+    body(provider { file("RELEASE_NOTES.md").readText() })
 }
