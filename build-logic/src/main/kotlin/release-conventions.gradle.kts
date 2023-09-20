@@ -26,8 +26,8 @@ fun git(vararg args: String): String {
     return output
 }
 
-val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.java) {
-}
+
+val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.java) { }
 
 val beforeReleaseHook by tasks.creating(DefaultTask::class.java) {
     outputs.upToDateWhen { false }
@@ -36,7 +36,7 @@ val beforeReleaseHook by tasks.creating(DefaultTask::class.java) {
 
 val releaseInternal by tasks.creating(ReleaseInternalTask::class.java) {
     outputs.upToDateWhen { false }
-    dependsOn(beforeReleaseHook, checkCleanWorkingCopy)
+    mustRunAfter(beforeReleaseHook)
 }
 
 val afterReleaseHook by tasks.creating(DefaultTask::class.java) {
@@ -47,9 +47,9 @@ val afterReleaseHook by tasks.creating(DefaultTask::class.java) {
 val finalizeRelease by tasks.creating(FinalizeReleaseTask::class.java) {
     outputs.upToDateWhen { false }
     onlyIf { providers.gradleProperty("RELEASE_DRY_RUN").orNull == "true" }
-    mustRunAfter(releaseInternal)
+    mustRunAfter(releaseInternal, afterReleaseHook)
 }
 
 val release by tasks.creating(DefaultTask::class.java) {
-    dependsOn(beforeReleaseHook, releaseInternal, afterReleaseHook, finalizeRelease)
+    dependsOn(checkCleanWorkingCopy, beforeReleaseHook, releaseInternal, afterReleaseHook, finalizeRelease)
 }
