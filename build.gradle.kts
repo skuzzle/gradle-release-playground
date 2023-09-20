@@ -18,5 +18,6 @@ githubRelease {
     owner.set(property("githubUser").toString())
     repo.set(property("githubRepo").toString())
     draft.set(true)
+    dryRun.set(providers.environmentVariable("RELEASE_DRY_RUN").map { it == "true" })
     body(provider { file("RELEASE_NOTES.md").readText() })
 }
