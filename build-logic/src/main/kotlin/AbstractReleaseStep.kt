@@ -34,6 +34,6 @@ abstract class AbstractReleaseStep : DefaultTask() {
         }
 
         println("$command:\n$output")
-        return output
+        return stdout
     }
 }
