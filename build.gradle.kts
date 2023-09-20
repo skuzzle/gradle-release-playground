@@ -19,5 +19,5 @@ githubRelease {
     repo.set(property("githubRepo").toString())
     draft.set(true)
     dryRun.set(providers.environmentVariable("RELEASE_DRY_RUN").map { it == "true" })
-    body(provider { file("RELEASE_NOTES.md").readText() })
+    body(providers.fileContents(layout.projectDirectory.file("RELEASE_NOTES.md")).asText)
 }
