@@ -25,7 +25,10 @@ abstract class ReleaseInternalTask : AbstractReleaseStep() {
 
         println("Merging release into main branch")
         git("checkout", "main")
-        git("merge", "v${releaseVersion}")
+        git("merge", "v${releaseVersion}", "--strategy-option", "theirs")
+
+        println("Status after merge")
+        println(git("status"))
     }
 
     fun tryParseVersion(v: String): Exception? {

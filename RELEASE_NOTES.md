@@ -1,1 +1,1 @@
-Release notes for 2.0.0-rc1
+Release notes for 2.0.0-rc2
