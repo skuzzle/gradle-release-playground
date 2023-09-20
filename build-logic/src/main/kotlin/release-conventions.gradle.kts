@@ -47,7 +47,7 @@ val afterReleaseHook by tasks.creating(DefaultTask::class.java) {
 val finalizeRelease by tasks.creating(FinalizeReleaseTask::class.java) {
     outputs.upToDateWhen { false }
     mustRunAfter(releaseInternal, afterReleaseHook)
-    releaseDryRun = providers.systemProperty("RELEASE_DRY_RUN").map { it == "true" }
+    releaseDryRun = providers.environmentVariable("RELEASE_DRY_RUN").map { it == "true" }
 }
 
 val release by tasks.creating(DefaultTask::class.java) {
