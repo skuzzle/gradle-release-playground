@@ -26,7 +26,6 @@ fun git(vararg args: String): String {
     return output
 }
 
-
 val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.java) { }
 
 val beforeReleaseHook by tasks.creating(DefaultTask::class.java) {
