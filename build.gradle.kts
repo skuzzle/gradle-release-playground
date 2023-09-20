@@ -14,10 +14,10 @@ tasks.named("afterReleaseHook").configure {
 }
 
 githubRelease {
-    token(provider { property("ghToken") as String? })
-    owner.set(property("githubUser").toString())
-    repo.set(property("githubRepo").toString())
     draft.set(true)
+    token(providers.gradleProperty("ghToken"))
+    owner.set(providers.gradleProperty("githubUser"))
+    repo.set(providers.gradleProperty("githubRepo"))
     dryRun.set(providers.environmentVariable("RELEASE_DRY_RUN").map { it == "true" })
-    body(providers.fileContents(layout.projectDirectory.file("RELEASE_NOTES.md")).asText)
+    body.set(providers.fileContents(layout.projectDirectory.file("RELEASE_NOTES.md")).asText)
 }
