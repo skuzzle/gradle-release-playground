@@ -20,12 +20,12 @@ abstract class FinalizeReleaseTask : AbstractReleaseStep() {
         }
 
         println("Pushing release commit to $currentBranch")
-        git("push")
+        git("push", "origin", "main")
         println("Pushing release tag")
         git("push", "--tags")
         println("Switching to dev branch")
         git("checkout", "dev")
         println("Pushing dev branch")
-        git("push")
+        git("push", "origin", "dev")
     }
 }
