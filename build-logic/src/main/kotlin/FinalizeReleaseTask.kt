@@ -7,12 +7,9 @@ import javax.inject.Inject
 
 abstract class FinalizeReleaseTask: AbstractReleaseStep() {
 
-    @get:[Input Optional]
-    abstract val releaseDryRun: Property<Boolean>
-
     @TaskAction
     fun finalizeRelease() {
-        if (releaseDryRun.get()) {
+        if (dryRun.get()) {
             print("Skipping finalize because releaseDryRun is true")
             return
         }

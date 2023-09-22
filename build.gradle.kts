@@ -8,6 +8,7 @@ listOf(":readme:generateReadmeAndReleaseNotes", ":hello-world:publishToMavenLoca
     tasks.findByPath(it)?.dependsOn(tasks.beforeReleaseHook)
 }
 
+
 /*tasks.beforeReleaseHook.configure {
     dependsOn(":readme:generateReadmeAndReleaseNotes", ":hello-world:publishToMavenLocal")
 }*/
