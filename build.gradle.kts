@@ -18,6 +18,6 @@ githubRelease {
     token(providers.gradleProperty("ghToken"))
     owner.set(providers.gradleProperty("githubUser"))
     repo.set(providers.gradleProperty("githubRepo"))
-    dryRun.set(providers.environmentVariable("RELEASE_DRY_RUN").map { it == "true" })
+    dryRun.set(providers.environmentVariable("RELEASE_DRY_RUN").map { it == "true" }.orElse(false))
     body.set(providers.fileContents(layout.projectDirectory.file("RELEASE_NOTES.md")).asText)
 }

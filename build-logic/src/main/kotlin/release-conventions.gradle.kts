@@ -1,11 +1,12 @@
 import de.skuzzle.semantic.Version
 
-val latestTagHash = git("rev-list", "--tags", "--max-count=1")
-val latestTagValue = git("describe", "--tags", latestTagHash, "--match=v[0-9]*")
+val git = Git(providers, provider { false }, provider { true })
+val latestTagHash = git.git("rev-list", "--tags", "--max-count=1")
+val latestTagValue = git.git("describe", "--tags", latestTagHash, "--match=v[0-9]*")
 val latestVersion = latestTagValue.substring(1)
-val branch = git("rev-parse", "--abbrev-ref", "HEAD")
+val branch = git.git("rev-parse", "--abbrev-ref", "HEAD")
 val pversion = rootProject.property("version")?.toString()
-val status = git("status", "--porcelain")
+val status = git.git("status", "--porcelain")
 
 rootProject.allprojects { this.version = determineVersion() }
 
@@ -15,15 +16,6 @@ fun determineVersion(): String {
         return pversion.toString()
     }
     return Version.parseVersion(latestVersion).nextPatch("$branch-SNAPSHOT").toString()
-}
-
-fun git(vararg args: String): String {
-    val fullArgs = listOf("git") + listOf(*args)
-    val exec = providers.exec { commandLine(fullArgs) }
-    val output = exec.standardOutput.asText.get().trim()
-
-    println("\$ ${fullArgs.joinToString(" ")}: $output")
-    return output
 }
 
 val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.java) { }
