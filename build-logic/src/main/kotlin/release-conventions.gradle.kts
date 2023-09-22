@@ -91,5 +91,6 @@ rootProject.subprojects {
         mustRunAfter(checkCleanWorkingCopy)
         alsoDependsOn = checkCleanWorkingCopy
     }
+    releaseInternal.mustRunAfter(beforeReleaseHook)
     release.dependsOn(beforeReleaseHook)
 }
