@@ -1,12 +1,9 @@
 import org.apache.tools.ant.filters.ReplaceTokens
-import org.jetbrains.kotlin.gradle.plugin.extraProperties
 
 val generateReadmeAndReleaseNotes by tasks.creating(DefaultTask::class.java) {
     notCompatibleWithConfigurationCache("Not yet")
     group = "release-relevant"
     description = "Copies the readme and release notes file into the root directory, replacing all placeholders"
-
-    this.extraProperties.set("releaseRelevant", true)
 
     doLast {
         copy {
@@ -23,6 +20,10 @@ val generateReadmeAndReleaseNotes by tasks.creating(DefaultTask::class.java) {
             )
         }
     }
+}
+
+tasks.beforeReleaseHook.configure {
+    releaseDependsOn(generateReadmeAndReleaseNotes)
 }
 
 

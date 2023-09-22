@@ -8,9 +8,8 @@ abstract class ReleaseHookTask : DefaultTask() {
 
     abstract val alsoDependsOn: Property<Task>
 
-    override fun dependsOn(vararg paths: Any?): Task {
-        super.dependsOn(*paths)
-        alsoDependsOn.orNull?.dependsOn(*paths)
-        return this
+    fun releaseDependsOn(task: Task) {
+        dependsOn(task)
+        task.dependsOn(alsoDependsOn)
     }
 }
