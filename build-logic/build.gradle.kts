@@ -15,6 +15,7 @@ dependencies {
     implementation(libs.gradle.spotless)
     implementation(libs.gradle.commonCustomUserData)
     implementation(libs.gradle.enterprise)
+    implementation(libs.githubRelease)
 }
 
 tasks {

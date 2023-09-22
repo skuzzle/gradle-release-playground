@@ -17,6 +17,15 @@ abstract class ReleaseExtension {
 
     @get:Input
     abstract val devBranch: Property<String>
+    @get:Input
+    abstract val githubRepoOwner: Property<String>
+    @get:Input
+    abstract val githubRepoName: Property<String>
+    @get:Input
+    abstract val githubReleaseToken: Property<String>
+    @get:Input
+    abstract val releaseNotesContent: Property<String>
+
 
     fun wireUp(releaseStep: AbstractReleaseStep) {
         val extension = this

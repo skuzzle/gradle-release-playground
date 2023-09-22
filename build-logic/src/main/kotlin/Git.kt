@@ -9,11 +9,16 @@ class Git(
     private val debugOutput: Provider<Boolean>
 ) {
 
-    private val writeOps = setOf("commit", "pull", "merge")
+    private val writeOps = setOf("commit", "pull", "merge", "checkout")
 
     fun status() = git("status", "--porcelain")
 
     fun currentBranch() = git("rev-parse", "--abbrev-ref", "HEAD")
+
+    fun lastReleaseTag(): String {
+        val latestTagHash = git("rev-list", "--tags", "--max-count=1")
+        return git("describe", "--tags", latestTagHash, "--match=v[0-9]*")
+    }
 
     private fun isReadonly() = readOnly.orElse(false).get()
 

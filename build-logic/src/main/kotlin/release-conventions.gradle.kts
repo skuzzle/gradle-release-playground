@@ -1,5 +1,8 @@
+import com.github.breadmoirai.githubreleaseplugin.GithubReleaseTask
 import de.skuzzle.semantic.Version
-
+plugins {
+    id("com.github.breadmoirai.github-release")
+}
 
 val releaseExtension = extensions.create<ReleaseExtension>(ReleaseExtension.NAME).apply {
     dryRun.convention(
@@ -14,15 +17,35 @@ val releaseExtension = extensions.create<ReleaseExtension>(ReleaseExtension.NAME
     )
     mainBranch.convention("main")
     devBranch.convention("dev")
+
+    githubReleaseToken.convention(
+        providers.systemProperty("RELEASE_GITHUB_TOKEN")
+            .orElse(providers.gradleProperty("releaseGithubToken"))
+            .orElse("<no token>")
+    )
+    githubRepoName.convention(
+        providers.systemProperty("RELEASE_GITHUB_REPO")
+            .orElse(providers.gradleProperty("releaseGithubRepo"))
+    )
+    githubRepoOwner.convention(
+        providers.systemProperty("RELEASE_GITHUB_OWNER")
+            .orElse(providers.gradleProperty("releaseGithubOwner"))
+    )
 }
 
+githubRelease {
+    draft.set(true)
+    token(releaseExtension.githubReleaseToken)
+    owner.set(releaseExtension.githubRepoOwner)
+    repo.set(releaseExtension.githubRepoName)
+    dryRun.set(releaseExtension.dryRun)
+    body.set(releaseExtension.releaseNotesContent)
+}
+
+
 val git = Git(providers, releaseExtension.dryRun, releaseExtension.verbose)
-val latestTagHash = git.git("rev-list", "--tags", "--max-count=1")
-val latestTagValue = git.git("describe", "--tags", latestTagHash, "--match=v[0-9]*")
+val latestTagValue = git.lastReleaseTag()
 val latestVersion = latestTagValue.substring(1)
-val branch = git.git("rev-parse", "--abbrev-ref", "HEAD")
-val pversion = rootProject.property("version")?.toString()
-val status = git.git("status", "--porcelain")
 
 rootProject.allprojects { this.version = determineVersion() }
 
@@ -31,8 +54,13 @@ fun determineVersion(): String {
     if (pversion != null) {
         return pversion.toString()
     }
-    return Version.parseVersion(latestVersion).nextPatch("$branch-SNAPSHOT").toString()
+    return Version.parseVersion(latestVersion).nextPatch("${git.currentBranch()}-SNAPSHOT").toString()
 }
+
+rootProject.subprojects {
+    val version by tasks.creating(VersionTask::class.java) {}
+}
+
 
 val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.java) {
     releaseExtension.wireUp(this)
@@ -52,6 +80,7 @@ val releaseInternal by tasks.creating(ReleaseInternalTask::class.java) {
 val afterReleaseHook by tasks.creating(DefaultTask::class.java) {
     outputs.upToDateWhen { false }
     mustRunAfter(releaseInternal)
+    dependsOn(tasks.withType(GithubReleaseTask::class.java))
 }
 
 val finalizeRelease by tasks.creating(FinalizeReleaseTask::class.java) {

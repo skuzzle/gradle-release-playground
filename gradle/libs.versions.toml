@@ -1,12 +1,4 @@
 [versions]
-junit5 = "5.10.0"
-assertj = "3.24.2"
-equalsverifier = "3.9"
-bytebuddy = "1.14.7"
-maven = "3.9.4"
-enforcerMin = "1.4.1"
-enforcerMax = "3.4.0"
-invokerPlugin = "3.6.0"
 
 [libraries]
 # can't update to latest because its writing to illegal places on jenkins
@@ -15,6 +7,7 @@ gradle-enterprise = { module = "com.gradle:gradle-enterprise-gradle-plugin", ver
 gradle-commonCustomUserData = { module = "com.gradle:common-custom-user-data-gradle-plugin", version = "1.11" }
 semanticVersion = { module = "de.skuzzle:semantic-version", version = "2.1.1" }
 axionRelease = { module = "pl.allegro.tech.build:axion-release-plugin", version = "1.15.4" }
+githubRelease = { module = "com.github.breadmoirai:github-release", version = "2.4.1" }
 
 [plugins]
 researchgate-release = { id = "net.researchgate.release", version = "3.0.2" }
