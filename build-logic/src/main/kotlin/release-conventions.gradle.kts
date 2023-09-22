@@ -3,7 +3,6 @@ import de.skuzzle.semantic.Version
 
 plugins {
     id("com.github.breadmoirai.github-release")
-    id("before-release-conventions")
 }
 
 require(project == rootProject) { "Release plugin should only be applied to root project" }
@@ -65,13 +64,15 @@ val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.jav
     releaseExtension.wireUp(this)
 }
 
-    val beforeReleaseHook = rootProject.subprojects.map { tasks.named("beforeReleaseHook") }
+rootProject.subprojects {
+    val beforeReleaseHook by this.tasks.creating(DefaultTask::class.java) {
+        mustRunAfter(checkCleanWorkingCopy)
+    }
+}
+
 afterEvaluate {
-    beforeReleaseHook.forEach {
-        it.configure {
-            println("wuuuuuuuuuu" + it)
-            dependsOn(checkCleanWorkingCopy)
-        }
+    rootProject.subprojects {
+        release.dependsOn(this.tasks.named("beforeReleaseHook"))
     }
 }
 
@@ -93,5 +94,5 @@ val finalizeRelease by tasks.creating(FinalizeReleaseTask::class.java) {
 }
 
 val release by tasks.creating(DefaultTask::class.java) {
-    dependsOn(checkCleanWorkingCopy, beforeReleaseHook, releaseInternal, afterReleaseHook, finalizeRelease)
+    dependsOn(checkCleanWorkingCopy, releaseInternal, afterReleaseHook, finalizeRelease)
 }

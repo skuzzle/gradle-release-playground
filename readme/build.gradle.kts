@@ -1,14 +1,9 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
-plugins {
-    id("before-release-conventions")
-}
-
 tasks.register("generateReadmeAndReleaseNotes") {
     notCompatibleWithConfigurationCache("Not yet")
     group = "release-relevant"
     description = "Copies the readme and release notes file into the root directory, replacing all placeholders"
-    dependsOn(tasks.beforeReleaseHook)
 
     doLast {
         copy {
