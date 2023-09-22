@@ -3,9 +3,10 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.work.DisableCachingByDefault
 import javax.inject.Inject
 
-
+@DisableCachingByDefault(because = "Not worth caching")
 abstract class AbstractReleaseStep() : DefaultTask() {
 
     @get:Inject

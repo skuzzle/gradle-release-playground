@@ -8,6 +8,9 @@ plugins {
 require(project == rootProject) { "Release plugin should only be applied to root project" }
 
 val releaseExtension = extensions.create<ReleaseExtension>(ReleaseExtension.NAME).apply {
+    mainBranch.convention("main")
+    devBranch.convention("dev")
+
     dryRun.convention(
         providers.systemProperty("RELEASE_DRY_RUN").map { it == "true" }
             .orElse(providers.gradleProperty("releaseDryRun").map { it == "true" })
@@ -18,8 +21,6 @@ val releaseExtension = extensions.create<ReleaseExtension>(ReleaseExtension.NAME
             .orElse(providers.gradleProperty("releaseVerbose").map { it == "true" })
             .orElse(false)
     )
-    mainBranch.convention("main")
-    devBranch.convention("dev")
 
     githubReleaseToken.convention(
         providers.systemProperty("RELEASE_GITHUB_TOKEN")
@@ -64,24 +65,20 @@ val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.jav
 }
 
 val beforeReleaseHook by tasks.creating(DefaultTask::class.java) {
-    outputs.upToDateWhen { false }
     mustRunAfter(checkCleanWorkingCopy)
 }
 
 val releaseInternal by tasks.creating(ReleaseInternalTask::class.java) {
-    outputs.upToDateWhen { false }
     mustRunAfter(beforeReleaseHook)
     releaseExtension.wireUp(this)
 }
 
 val afterReleaseHook by tasks.creating(DefaultTask::class.java) {
-    outputs.upToDateWhen { false }
     mustRunAfter(releaseInternal)
     dependsOn(tasks.withType(GithubReleaseTask::class.java))
 }
 
 val finalizeRelease by tasks.creating(FinalizeReleaseTask::class.java) {
-    outputs.upToDateWhen { false }
     mustRunAfter(releaseInternal, afterReleaseHook)
     releaseExtension.wireUp(this)
 }
