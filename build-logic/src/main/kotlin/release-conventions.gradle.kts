@@ -95,5 +95,5 @@ rootProject.subprojects {
 
     release.dependsOn(beforeReleaseHook, checkCleanWorkingCopyHook)
     releaseInternal.mustRunAfter(beforeReleaseHook, checkCleanWorkingCopyHook)
-    checkCleanWorkingCopy.dependsOn(checkCleanWorkingCopyHook)
+    checkCleanWorkingCopyHook.dependsOn(checkCleanWorkingCopy)
 }
