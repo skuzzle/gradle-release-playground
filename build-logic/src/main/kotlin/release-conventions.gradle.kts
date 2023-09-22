@@ -60,12 +60,8 @@ fun determineVersion(): String {
     return Version.parseVersion(latestVersion).nextPatch("${git.currentBranch()}-SNAPSHOT").toString()
 }
 
-val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.java) {
+val beforeReleaseHook by tasks.creating(CheckCleanWorkingCopyTask::class.java) {
     releaseExtension.wireUp(this)
-}
-
-val beforeReleaseHook by tasks.creating(DefaultTask::class.java) {
-    mustRunAfter(checkCleanWorkingCopy)
 }
 
 val releaseInternal by tasks.creating(ReleaseInternalTask::class.java) {
@@ -87,5 +83,5 @@ val finalizeRelease by tasks.creating(FinalizeReleaseTask::class.java) {
 }
 
 val release by tasks.creating(DefaultTask::class.java) {
-    dependsOn(checkCleanWorkingCopy, beforeReleaseHook, releaseInternal, afterReleaseHook, finalizeRelease)
+    dependsOn(beforeReleaseHook, releaseInternal, afterReleaseHook, finalizeRelease)
 }
