@@ -86,9 +86,8 @@ val release by tasks.creating(DefaultTask::class.java) {
 }
 
 rootProject.subprojects {
-    val beforeReleaseHook by this.tasks.creating(DefaultTask::class.java) {
+    val beforeReleaseHook by this.tasks.creating(ReleaseHookTask::class.java) {
         mustRunAfter(checkCleanWorkingCopy)
-        outputs.upToDateWhen { false }
     }
     release.dependsOn(this.tasks.named("beforeReleaseHook"))
 }
