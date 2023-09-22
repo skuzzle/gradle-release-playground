@@ -64,6 +64,10 @@ val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.jav
     releaseExtension.wireUp(this)
 }
 
+val afterCheckCleanWorkingCopyHookInternal by this.tasks.creating(ReleaseHookTask::class.java) {
+    dependsOn(checkCleanWorkingCopy)
+}
+
 val releaseInternal by tasks.creating(ReleaseInternalTask::class.java) {
     mustRunAfter(checkCleanWorkingCopy)
     releaseExtension.wireUp(this)
@@ -90,10 +94,10 @@ rootProject.subprojects {
     val beforeReleaseHook by this.tasks.creating(ReleaseHookTask::class.java) {
         mustRunAfter(checkCleanWorkingCopy)
     }
-    val checkCleanWorkingCopyHook by this.tasks.creating(ReleaseHookTask::class.java) {
+    val afterCheckCleanWorkingCopyHook by this.tasks.creating(ReleaseHookTask::class.java) {
+        mustRunAfter(afterCheckCleanWorkingCopyHookInternal)
     }
 
-    release.dependsOn(beforeReleaseHook, checkCleanWorkingCopyHook)
-    releaseInternal.mustRunAfter(beforeReleaseHook, checkCleanWorkingCopyHook)
-    checkCleanWorkingCopyHook.dependsOn(checkCleanWorkingCopy)
+    release.dependsOn(beforeReleaseHook, afterCheckCleanWorkingCopyHook)
+
 }

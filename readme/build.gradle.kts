@@ -4,7 +4,7 @@ val generateReadmeAndReleaseNotes by tasks.creating(DefaultTask::class.java) {
     notCompatibleWithConfigurationCache("Not yet")
     group = "release-relevant"
     description = "Copies the readme and release notes file into the root directory, replacing all placeholders"
-    dependsOn(tasks.checkCleanWorkingCopyHook)
+    dependsOn(tasks.afterCheckCleanWorkingCopyHook)
 
     doLast {
         copy {
