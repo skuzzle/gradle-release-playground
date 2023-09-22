@@ -12,22 +12,24 @@ abstract class FinalizeReleaseTask: AbstractReleaseStep() {
 
     @TaskAction
     fun finalizeRelease() {
-        if (releaseDryRun.getOrElse(false)) {
-            println("Skipping finalize because releaseDryRun is true")
+        if (releaseDryRun.get()) {
+            print("Skipping finalize because releaseDryRun is true")
             return
         }
         val currentBranch = git.currentBranch()
-        if (currentBranch != "main") {
+        val mainBranch = mainBranch.get()
+        val devBranch = devBranch.get()
+        if (currentBranch != mainBranch) {
             throw IllegalStateException("Can not finalize release: expected to be on release branch but was: $currentBranch")
         }
 
         println("Pushing release commit to $currentBranch")
-        git.git("push", "origin", "main")
+        git.git("push", "origin", mainBranch)
         println("Pushing release tag")
         git.git("push", "--tags")
         println("Switching to dev branch")
-        git.git("checkout", "dev")
+        git.git("checkout", devBranch)
         println("Pushing dev branch")
-        git.git("push", "origin", "dev")
+        git.git("push", "origin", devBranch)
     }
 }

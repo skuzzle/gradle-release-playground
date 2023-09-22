@@ -15,22 +15,17 @@ abstract class ReleaseInternalTask : AbstractReleaseStep() {
         }
 
         val branch = git.currentBranch()
-        println("Releasing $releaseVersion from branch $branch")
-
-        println("Adding files to git:\n${git.status()}")
+        print("Releasing $releaseVersion from branch $branch")
+        print("Creating release commit & tag with ${git.status().lines().count()} modified files")
         git.git("add", ".")
 
-        println("Creating release commit & tag")
+        printVerbose("Creating release commit & tag")
         git.git("commit", "-m", "Release $releaseVersion")
         git.git("tag", "-a", "v${releaseVersion}", "-m", "Release $releaseVersion")
 
-        println("Merging release into main branch")
-        git.git("checkout", "main")
+        print("Merging release into main branch")
+        git.git("checkout", mainBranch.get())
         git.git("merge", "v${releaseVersion}", "--strategy-option", "theirs")
-
-        // TODO revisit output formatting if debug mode
-        println("Status after merge")
-        println(git.git("status"))
     }
 
     fun tryParseVersion(v: String): Exception? {
