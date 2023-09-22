@@ -32,7 +32,7 @@ class Git(
         val mainCommand = args[0]
         if (isReadonly() && writeOps.contains(mainCommand)) {
             if (isDebug()) {
-                println("$command\n> Skipped because readOnly mode is enabled")
+                println("$command\n> SKIPPED because readOnly mode is enabled")
             }
             return ""
         }
