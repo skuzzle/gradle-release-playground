@@ -91,7 +91,6 @@ rootProject.subprojects {
         mustRunAfter(checkCleanWorkingCopy)
     }
     val checkCleanWorkingCopyHook by this.tasks.creating(ReleaseHookTask::class.java) {
-        mustRunAfter(checkCleanWorkingCopy)
     }
 
     release.dependsOn(beforeReleaseHook, checkCleanWorkingCopyHook)
