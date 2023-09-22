@@ -62,10 +62,16 @@ fun determineVersion(): String {
 
 val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.java) {
     releaseExtension.wireUp(this)
+    doFirst {
+        println("CHECK CLEAN")
+    }
 }
 
 val beforeReleaseHook by tasks.creating(DefaultTask::class.java) {
     mustRunAfter(checkCleanWorkingCopy)
+    doFirst {
+        println("BEFORE RELEASE HOOK")
+    }
 }
 
 val releaseInternal by tasks.creating(ReleaseInternalTask::class.java) {
