@@ -1,8 +1,11 @@
 import com.github.breadmoirai.githubreleaseplugin.GithubReleaseTask
 import de.skuzzle.semantic.Version
+
 plugins {
     id("com.github.breadmoirai.github-release")
 }
+
+require(project == rootProject) { "Release plugin should only be applied to root project" }
 
 val releaseExtension = extensions.create<ReleaseExtension>(ReleaseExtension.NAME).apply {
     dryRun.convention(
@@ -42,25 +45,19 @@ githubRelease {
     body.set(releaseExtension.releaseNotesContent)
 }
 
-
-val git = Git(providers, releaseExtension.dryRun, releaseExtension.verbose)
-val latestTagValue = git.lastReleaseTag()
-val latestVersion = latestTagValue.substring(1)
-
-rootProject.allprojects { this.version = determineVersion() }
+val projectVersion = determineVersion()
+rootProject.allprojects { this.version = projectVersion }
 
 fun determineVersion(): String {
+    val git = Git(providers, releaseExtension.dryRun, releaseExtension.verbose)
+    val latestTagValue = git.lastReleaseTag()
+    val latestVersion = latestTagValue.substring(1)
     val pversion = rootProject.findProperty("releaseVersion")?.toString()
     if (pversion != null) {
         return pversion.toString()
     }
     return Version.parseVersion(latestVersion).nextPatch("${git.currentBranch()}-SNAPSHOT").toString()
 }
-
-rootProject.subprojects {
-    val version by tasks.creating(VersionTask::class.java) {}
-}
-
 
 val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.java) {
     releaseExtension.wireUp(this)

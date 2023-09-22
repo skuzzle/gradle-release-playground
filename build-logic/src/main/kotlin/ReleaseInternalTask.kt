@@ -21,7 +21,9 @@ abstract class ReleaseInternalTask : AbstractReleaseStep() {
 
         printVerbose("Creating release commit & tag")
         git.git("commit", "-m", "Release $releaseVersion")
-        git.git("tag", "-a", "v${releaseVersion}", "-m", "Release $releaseVersion")
+        if (!dryRun.get()) {
+            git.git("tag", "-a", "v${releaseVersion}", "-m", "Release $releaseVersion")
+        }
 
         print("Merging release into main branch")
         git.git("checkout", mainBranch.get())
