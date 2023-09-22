@@ -22,7 +22,7 @@ val generateReadmeAndReleaseNotes by tasks.creating(DefaultTask::class.java) {
     }
 }
 
-tasks.beforeReleaseHook.configure {
+tasks.checkCleanWorkingCopyHook.configure {
     dependsOn(generateReadmeAndReleaseNotes)
 }
 
