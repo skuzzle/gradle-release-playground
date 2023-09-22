@@ -90,8 +90,11 @@ val release by tasks.creating(DefaultTask::class.java) {
 rootProject.subprojects {
     val beforeReleaseHook by this.tasks.creating(ReleaseHookTask::class.java) {
     }
-    tasks.find {
-        it.extraProperties.properties.contains("releaseRelevant")
-    }?.dependsOn(checkCleanWorkingCopy)
+    tasks.forEach {
+        if (it.extraProperties.properties.contains("releaseRelevant")) {
+            println("IIIIIIIIIIIII $it")
+            it.dependsOn(checkCleanWorkingCopy)
+        }
+    }
     release.dependsOn(beforeReleaseHook)
 }
