@@ -1,1 +1,1 @@
-Release notes for 2.0.1-dev-SNAPSHOT
+Release notes for 1.2.3

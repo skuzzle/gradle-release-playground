@@ -6,16 +6,6 @@ import org.gradle.api.tasks.Internal
 import javax.inject.Inject
 
 
-/*
-
-abstract class CucumberCompanionExtension @Inject constructor(
-    @Internal
-    private val taskContainer: TaskContainer,
-    @Internal
-    private val projectLayout: ProjectLayout
-) {
- */
-
 abstract class AbstractReleaseStep() : DefaultTask() {
 
     @get:Inject
@@ -25,6 +15,10 @@ abstract class AbstractReleaseStep() : DefaultTask() {
     abstract val dryRun: Property<Boolean>
     @get:Input
     abstract val verbose: Property<Boolean>
+    @get:Input
+    abstract val mainBranch: Property<String>
+    @get:Input
+    abstract val devBranch: Property<String>
 
     @get:Internal
     val git: Git
@@ -33,6 +27,20 @@ abstract class AbstractReleaseStep() : DefaultTask() {
         dryRun.convention(false)
         verbose.convention(true)
         git = Git(providers, dryRun, verbose)
+    }
+
+    fun print(s: String) {
+        println(s)
+    }
+
+    fun printOrVerbose(normal: String, verbose: String) {
+        if (this.verbose.get()) print(verbose) else print(normal)
+    }
+
+    fun printVerbose(s: String) {
+        if (verbose.get()) {
+            print(s)
+        }
     }
 
 }
