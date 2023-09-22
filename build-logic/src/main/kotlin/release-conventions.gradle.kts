@@ -1,5 +1,6 @@
 import com.github.breadmoirai.githubreleaseplugin.GithubReleaseTask
 import de.skuzzle.semantic.Version
+import org.jetbrains.kotlin.gradle.plugin.extraProperties
 
 plugins {
     id("com.github.breadmoirai.github-release")
@@ -89,6 +90,8 @@ val release by tasks.creating(DefaultTask::class.java) {
 rootProject.subprojects {
     val beforeReleaseHook by this.tasks.creating(ReleaseHookTask::class.java) {
     }
-    checkCleanWorkingCopy.finalizedBy(beforeReleaseHook)
+    tasks.find {
+        it.extraProperties.properties.contains("releaseRelevant")
+    }?.dependsOn(checkCleanWorkingCopy)
     release.dependsOn(beforeReleaseHook)
 }
