@@ -64,7 +64,7 @@ val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.jav
     releaseExtension.wireUp(this)
 }
 
-val afterCheckCleanWorkingCopyHookInternal by this.tasks.creating(ReleaseHookTask::class.java) {
+val afterCheckCleanWorkingCopyHookInternal by tasks.creating(ReleaseHookTask::class.java) {
     dependsOn(checkCleanWorkingCopy)
 }
 
