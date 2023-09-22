@@ -1,10 +1,9 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
-tasks.register("generateReadmeAndReleaseNotes") {
+val generateReadmeAndReleaseNotes by tasks.creating(DefaultTask::class.java) {
     notCompatibleWithConfigurationCache("Not yet")
     group = "release-relevant"
     description = "Copies the readme and release notes file into the root directory, replacing all placeholders"
-    dependsOn(tasks.beforeReleaseHook)
 
     doLast {
         copy {
@@ -22,4 +21,9 @@ tasks.register("generateReadmeAndReleaseNotes") {
         }
     }
 }
+
+tasks.beforeReleaseHook.configure {
+    dependsOn(generateReadmeAndReleaseNotes)
+}
+
 println("Version in ${project.name}: ${project.version}")
