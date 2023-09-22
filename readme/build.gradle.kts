@@ -22,9 +22,5 @@ val generateReadmeAndReleaseNotes by tasks.creating(DefaultTask::class.java) {
     }
 }
 
-tasks.afterCheckCleanWorkingCopyHook.configure {
-    dependsOn(generateReadmeAndReleaseNotes)
-}
-
 
 println("Version in ${project.name}: ${project.version}")
