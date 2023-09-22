@@ -4,9 +4,12 @@ plugins {
 
 println("Version in ${project.name}: ${project.version}")
 
-listOf(":readme:generateReadmeAndReleaseNotes", ":hello-world:publishToMavenLocal").forEach {
-    tasks.findByPath(it)?.dependsOn(tasks.beforeReleaseHook)
-}
+listOf(":readme:generateReadmeAndReleaseNotes", ":hello-world:publishToMavenLocal")
+    .mapNotNull { tasks.findByPath(it) }
+    .forEach {
+        println("TTTTTTTTTTTTASK $it")
+        it.dependsOn(tasks.beforeReleaseHook)
+    }
 
 
 /*tasks.beforeReleaseHook.configure {
