@@ -32,6 +32,11 @@ pipeline {
         sh 'git status'
       }
     }
+    stage('Check working copy clean') {
+      steps {
+        sh './gradlew checkCleanWorkingCopy
+      }
+    }
     stage('Release') {
       steps {
         sh './gradlew release -PreleaseVersion=${RELEASE_VERSION}'

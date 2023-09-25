@@ -61,7 +61,6 @@ fun calculateVersion(): String {
 }
 
 // Task execution order:
-// - checkCleanWorkingCopy
 // - <beforeReleaseHook: release relevant tasks from sub project>
 // - releaseInternal
 // - <afterReleaseHook: release relevant tasks from sub project>
@@ -72,30 +71,26 @@ val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.jav
 }
 
 val releaseInternal by tasks.creating(ReleaseInternalTask::class.java) {
-    mustRunAfter(checkCleanWorkingCopy)
     releaseExtension.wireUp(this)
 }
 
-val afterReleaseHook by tasks.creating(DefaultTask::class.java) {
-    mustRunAfter(releaseInternal)
-}
-
-tasks.withType(GithubReleaseTask::class.java).configureEach {
-    dependsOn(afterReleaseHook)
-}
+val ghReleaseTask = tasks.withType(GithubReleaseTask::class.java)
 
 val finalizeRelease by tasks.creating(FinalizeReleaseTask::class.java) {
-    mustRunAfter(releaseInternal, afterReleaseHook)
+    mustRunAfter(releaseInternal)
     releaseExtension.wireUp(this)
 }
 
 val release by tasks.creating(DefaultTask::class.java) {
-    dependsOn(checkCleanWorkingCopy, releaseInternal, afterReleaseHook, finalizeRelease)
+    dependsOn(releaseInternal, finalizeRelease)
 }
 
 rootProject.subprojects {
     val beforeReleaseHook by this.tasks.creating(ReleaseHookTask::class.java) {
-        mustRunAfter(checkCleanWorkingCopy)
+    }
+    val afterReleaseHook by this.tasks.creating(ReleaseHookTask::class.java) {
+        dependsOn(ghReleaseTask)
     }
     release.dependsOn(beforeReleaseHook)
+    finalizeRelease.dependsOn(afterReleaseHook)
 }
