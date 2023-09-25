@@ -46,10 +46,10 @@ githubRelease {
     body.set(releaseExtension.releaseNotesContent)
 }
 
-val projectVersion = determineVersion()
-rootProject.allprojects { this.version = projectVersion }
+val calculatedVersion = calculateVersion()
+rootProject.allprojects { this.version = calculatedVersion }
 
-fun determineVersion(): String {
+fun calculateVersion(): String {
     val git = Git(providers, releaseExtension.dryRun, releaseExtension.verbose)
     val latestTagValue = git.lastReleaseTag()
     val latestVersion = latestTagValue.substring(1)
@@ -59,6 +59,13 @@ fun determineVersion(): String {
     }
     return Version.parseVersion(latestVersion).nextPatch("${git.currentBranch()}-SNAPSHOT").toString()
 }
+
+// Task execution order:
+// - checkCleanWorkingCopy
+// - <beforeReleaseHook: release relevant tasks from sub project>
+// - releaseInternal
+// - <afterReleaseHook: release relevant tasks from sub project>
+// - finalizeRelease
 
 val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.java) {
     releaseExtension.wireUp(this)
@@ -89,8 +96,6 @@ val release by tasks.creating(DefaultTask::class.java) {
 rootProject.subprojects {
     val beforeReleaseHook by this.tasks.creating(ReleaseHookTask::class.java) {
         mustRunAfter(checkCleanWorkingCopy)
-        alsoDependsOn = checkCleanWorkingCopy
     }
-    releaseInternal.mustRunAfter(beforeReleaseHook)
     release.dependsOn(beforeReleaseHook)
 }
