@@ -7,7 +7,7 @@ pipeline {
   }
   environment {
     GITHUB = credentials('Github-Username-Pw')
-    GITHUB_RELEASE_TOKEN = credentials('github_registry_release')
+    RELEASE_GITHUB_TOKEN = credentials('github_registry_release')
     ORG_GRADLE_PROJECT_ghToken = credentials('github_registry_release')
     GIT_ASKPASS='./.git-askpass'
   }
