@@ -1,30 +1,28 @@
-import org.apache.tools.ant.filters.ReplaceTokens
 
-val generateReadmeAndReleaseNotes by tasks.creating(DefaultTask::class.java) {
-    notCompatibleWithConfigurationCache("Not yet")
+val generateReadmeAndReleaseNotes by tasks.creating(CopyAndFilterReadme::class.java) {
     group = "release-relevant"
     description = "Copies the readme and release notes file into the root directory, replacing all placeholders"
+    replaceTokens = mapOf(
+        "project.version" to project.version.toString(),
+        "project.groupId" to project.group.toString(),
+        "github.user" to providers.gradleProperty("githubUser"),
+    )
+    sourceDir.set(project.projectDir)
+    targetDir.set(project.rootDir)
 
-    doLast {
-        copy {
-            from(project.projectDir) {
-                include("*.md")
-            }
-            into(project.rootDir)
-            filter(
-                ReplaceTokens::class, "tokens" to mapOf(
-                    "project.version" to project.version as String,
-                    "project.groupId" to project.group as String,
-                    "github.user" to "skuzzle",
-                )
-            )
+    /*copySpec.set{
+        from(project.projectDir) {
+            include("*.md")
         }
-    }
+        into(project.rootDir)
+        filter(
+            ReplaceTokens::class, "tokens" to mapOf(
+                "project.version" to providers.gradleProperty("version"),
+                "project.groupId" to providers.gradleProperty("group"),
+                "github.user" to "skuzzle",
+            )
+        )
+    }*/
 }
-
-tasks.beforeReleaseHook.configure {
-    releaseDependsOn(generateReadmeAndReleaseNotes)
-}
-
 
 println("Version in ${project.name}: ${project.version}")
