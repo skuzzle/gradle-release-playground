@@ -34,7 +34,7 @@ pipeline {
     }
     stage('Check working copy clean') {
       steps {
-        sh './gradlew checkCleanWorkingCopy
+        sh './gradlew checkCleanWorkingCopy'
       }
     }
     stage('Release') {
