@@ -86,6 +86,7 @@ val release by tasks.creating(DefaultTask::class.java) {
 
 afterEvaluate {
     rootProject.subprojects {
-        finalizeRelease.dependsOn(this.tasks.filter { it.extraProperties.get("releaseRelevant") != null })
+        this.tasks.filter { it.extra.extraProperties.get("releaseRelevant") != null }.forEach { println(it) }
+        finalizeRelease.dependsOn(this.tasks.filter { it.extra.get("releaseRelevant") != null })
     }
 }

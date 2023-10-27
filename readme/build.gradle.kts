@@ -8,7 +8,7 @@ val generateReadmeAndReleaseNotes by tasks.creating(CopyAndFilterReadme::class.j
         "project.groupId" to project.group.toString(),
         "github.user" to providers.gradleProperty("githubUser"),
     )
-    extraProperties.set("releaseRelevant", true)
+    extra.set("releaseRelevant", true)
     sourceDir.set(project.projectDir)
     targetDir.set(project.rootDir)
 }
