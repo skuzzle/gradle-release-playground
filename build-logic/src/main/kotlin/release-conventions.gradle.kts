@@ -14,26 +14,31 @@ val releaseExtension = extensions.create<ReleaseExtension>(ReleaseExtension.NAME
 
     dryRun.convention(
         providers.systemProperty("RELEASE_DRY_RUN").map { it == "true" }
+            .orElse(providers.environmentVariable("RELEASE_DRY_RUN").map { it == "true" })
             .orElse(providers.gradleProperty("releaseDryRun").map { it == "true" })
             .orElse(false)
     )
     verbose.convention(
         providers.systemProperty("RELEASE_VERBOSE").map { it == "true" }
+            .orElse(providers.environmentVariable("RELEASE_VERBOSE").map { it == "true" })
             .orElse(providers.gradleProperty("releaseVerbose").map { it == "true" })
             .orElse(false)
     )
 
     githubReleaseToken.convention(
         providers.systemProperty("RELEASE_GITHUB_TOKEN")
+            .orElse(providers.environmentVariable("RELEASE_GITHUB_TOKEN"))
             .orElse(providers.gradleProperty("releaseGithubToken"))
             .orElse("<no token>")
     )
     githubRepoName.convention(
         providers.systemProperty("RELEASE_GITHUB_REPO")
+            .orElse(providers.environmentVariable("RELEASE_GITHUB_REPO"))
             .orElse(providers.gradleProperty("releaseGithubRepo"))
     )
     githubRepoOwner.convention(
         providers.systemProperty("RELEASE_GITHUB_OWNER")
+            .orElse(providers.environmentVariable("RELEASE_GITHUB_OWNER"))
             .orElse(providers.gradleProperty("releaseGithubOwner"))
     )
 }
@@ -56,6 +61,7 @@ fun calculateVersion(): String {
     val latestTagValue = git.lastReleaseTag()
     val latestVersion = latestTagValue.substring(1)
     val pversion = providers.systemProperty("RELEASE_VERSION")
+        .orElse(providers.environmentVariable("RELEASE_VERSION"))
         .orElse(providers.gradleProperty("releaseVersion"))
         .orNull
     if (pversion != null) {
