@@ -14,10 +14,13 @@ abstract class AbstractReleaseStep() : DefaultTask() {
 
     @get:Input
     abstract val dryRun: Property<Boolean>
+
     @get:Input
     abstract val verbose: Property<Boolean>
+
     @get:Input
     abstract val mainBranch: Property<String>
+
     @get:Input
     abstract val devBranch: Property<String>
 

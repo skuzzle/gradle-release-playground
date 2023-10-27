@@ -26,7 +26,6 @@ abstract class ReleaseExtension {
     @get:Input
     abstract val releaseNotesContent: Property<String>
 
-
     fun wireUp(releaseStep: AbstractReleaseStep) {
         val extension = this
         releaseStep.apply {

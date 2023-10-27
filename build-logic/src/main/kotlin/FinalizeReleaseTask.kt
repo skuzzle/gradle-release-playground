@@ -1,23 +1,20 @@
-import org.gradle.api.provider.Property
-import org.gradle.api.provider.ProviderFactory
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
-import javax.inject.Inject
 
-abstract class FinalizeReleaseTask: AbstractReleaseStep() {
+abstract class FinalizeReleaseTask : AbstractReleaseStep() {
 
     @TaskAction
     fun finalizeRelease() {
-        if (dryRun.get()) {
-            print("Skipping finalize because releaseDryRun is true")
-            return
-        }
         val currentBranch = git.currentBranch()
         val mainBranch = mainBranch.get()
         val devBranch = devBranch.get()
         if (currentBranch != mainBranch) {
-            throw IllegalStateException("Can not finalize release: expected to be on release branch but was: $currentBranch")
+            val message =
+                "Can not finalize release: expected to be on main branch '$mainBranch' but was: $currentBranch"
+            if (dryRun.get()) {
+                println(message)
+            } else {
+                throw IllegalStateException(message)
+            }
         }
 
         println("Pushing release commit to $currentBranch")

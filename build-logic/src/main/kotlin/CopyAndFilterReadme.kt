@@ -43,12 +43,12 @@ abstract class CopyAndFilterReadme : DefaultTask() {
     }
 
     private fun mapValue(value: Any?): String? {
-        if (value == null) {
-            return "<unknown>"
+        return if (value == null) {
+            "<unknown>"
         } else if (value is Provider<*>) {
-            return mapValue(value.orNull)
+            mapValue(value.orNull)
         } else {
-            return value.toString()
+            value.toString()
         }
     }
 }

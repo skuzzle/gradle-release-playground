@@ -1,7 +1,7 @@
 import de.skuzzle.semantic.Version
 import org.gradle.api.tasks.TaskAction
 
-abstract class ReleaseInternalTask : AbstractReleaseStep() {
+abstract class PrepareReleaseTask : AbstractReleaseStep() {
 
     @Throws(IllegalStateException::class)
     @TaskAction

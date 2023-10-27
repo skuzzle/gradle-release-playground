@@ -1,5 +1,5 @@
-import com.github.breadmoirai.githubreleaseplugin.GithubReleaseTask
 import de.skuzzle.semantic.Version
+import org.jetbrains.kotlin.gradle.plugin.extraProperties
 
 plugins {
     id("com.github.breadmoirai.github-release")
@@ -70,27 +70,22 @@ val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.jav
     releaseExtension.wireUp(this)
 }
 
-val releaseInternal by tasks.creating(ReleaseInternalTask::class.java) {
+val prepareRelease by tasks.creating(PrepareReleaseTask::class.java) {
+    mustRunAfter(checkCleanWorkingCopy)
     releaseExtension.wireUp(this)
 }
 
-val ghReleaseTask = tasks.withType(GithubReleaseTask::class.java)
-
 val finalizeRelease by tasks.creating(FinalizeReleaseTask::class.java) {
-    mustRunAfter(releaseInternal)
+    mustRunAfter(prepareRelease)
     releaseExtension.wireUp(this)
 }
 
 val release by tasks.creating(DefaultTask::class.java) {
-    dependsOn(releaseInternal, finalizeRelease)
+    dependsOn(checkCleanWorkingCopy, prepareRelease, finalizeRelease)
 }
 
-rootProject.subprojects {
-    val beforeReleaseHook by this.tasks.creating(ReleaseHookTask::class.java) {
+afterEvaluate {
+    rootProject.subprojects {
+        finalizeRelease.dependsOn(this.tasks.filter { it.extraProperties.get("releaseRelevant") != null })
     }
-    val afterReleaseHook by this.tasks.creating(ReleaseHookTask::class.java) {
-        dependsOn(ghReleaseTask)
-    }
-    release.dependsOn(beforeReleaseHook)
-    finalizeRelease.dependsOn(afterReleaseHook)
 }

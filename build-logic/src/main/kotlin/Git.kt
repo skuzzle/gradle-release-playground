@@ -9,7 +9,7 @@ class Git(
     private val debugOutput: Provider<Boolean>
 ) {
 
-    private val writeOps = setOf("commit", "pull", "merge", "checkout")
+    private val writeOps = setOf("commit", "pull", "merge", "checkout", "push")
 
     fun status() = git("status", "--porcelain")
 

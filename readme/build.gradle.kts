@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.extraProperties
+
 val generateReadmeAndReleaseNotes by tasks.creating(CopyAndFilterReadme::class.java) {
     group = "release-relevant"
     description = "Copies the readme and release notes file into the root directory, replacing all placeholders"
@@ -6,11 +8,10 @@ val generateReadmeAndReleaseNotes by tasks.creating(CopyAndFilterReadme::class.j
         "project.groupId" to project.group.toString(),
         "github.user" to providers.gradleProperty("githubUser"),
     )
+    extraProperties.set("releaseRelevant", true)
     sourceDir.set(project.projectDir)
     targetDir.set(project.rootDir)
 }
-
-tasks.beforeReleaseHook.configure { dependsOn(generateReadmeAndReleaseNotes) }
 
 
 println("Version in ${project.name}: ${project.version}")
