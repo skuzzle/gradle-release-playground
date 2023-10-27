@@ -8,8 +8,10 @@ abstract class ReleaseLocalTask : AbstractReleaseStep() {
     @Throws(IllegalStateException::class)
     @TaskAction
     fun release() {
-        val releaseVersion = providers.gradleProperty("releaseVersion").orNull
-            ?: throw IllegalStateException("Can not release: No -PreleaseVersion=x.y.z parameter specified")
+        val releaseVersion = providers.systemProperty("RELEASE_VERSION")
+            .orElse(providers.environmentVariable("RELEASE_VERSION"))
+            .orElse(providers.gradleProperty("releaseVersion"))
+            .orNull ?: throw IllegalStateException("Can not release: No -PreleaseVersion=x.y.z parameter specified")
 
         val parseError = tryParseVersion(releaseVersion)
         if (parseError != null) {
