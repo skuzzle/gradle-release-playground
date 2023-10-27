@@ -1,3 +1,5 @@
+package de.skuzzle.release
+
 import org.gradle.api.tasks.TaskAction
 
 abstract class FinalizeReleaseTask : AbstractReleaseStep() {

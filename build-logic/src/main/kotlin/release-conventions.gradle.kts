@@ -1,5 +1,6 @@
+import com.github.breadmoirai.githubreleaseplugin.GithubReleaseTask
+import de.skuzzle.release.*
 import de.skuzzle.semantic.Version
-import org.jetbrains.kotlin.gradle.plugin.extraProperties
 
 plugins {
     id("com.github.breadmoirai.github-release")
@@ -44,6 +45,7 @@ githubRelease {
     repo.set(releaseExtension.githubRepoName)
     dryRun.set(releaseExtension.dryRun)
     body.set(releaseExtension.releaseNotesContent)
+    targetCommitish.set(releaseExtension.mainBranch)
 }
 
 val calculatedVersion = calculateVersion()
@@ -60,33 +62,24 @@ fun calculateVersion(): String {
     return Version.parseVersion(latestVersion).nextPatch("${git.currentBranch()}-SNAPSHOT").toString()
 }
 
-// Task execution order:
-// - <beforeReleaseHook: release relevant tasks from sub project>
-// - releaseInternal
-// - <afterReleaseHook: release relevant tasks from sub project>
-// - finalizeRelease
-
 val checkCleanWorkingCopy by tasks.creating(CheckCleanWorkingCopyTask::class.java) {
     releaseExtension.wireUp(this)
 }
 
-val prepareRelease by tasks.creating(PrepareReleaseTask::class.java) {
-    mustRunAfter(checkCleanWorkingCopy)
+val releaseLocal by tasks.creating(ReleaseLocalTask::class.java) {
     releaseExtension.wireUp(this)
 }
 
-val finalizeRelease by tasks.creating(FinalizeReleaseTask::class.java) {
-    mustRunAfter(prepareRelease)
+val pushReleaseInternal by tasks.creating(FinalizeReleaseTask::class.java) {
     releaseExtension.wireUp(this)
 }
 
-val release by tasks.creating(DefaultTask::class.java) {
-    dependsOn(checkCleanWorkingCopy, prepareRelease, finalizeRelease)
+val releaseTasks = tasks.withType(GithubReleaseTask::class.java)
+
+releaseTasks.configureEach {
+    dependsOn(pushReleaseInternal)
 }
 
-afterEvaluate {
-    rootProject.subprojects {
-        this.tasks.filter { it.extra.extraProperties.get("releaseRelevant") != null }.forEach { println(it) }
-        finalizeRelease.dependsOn(this.tasks.filter { it.extra.get("releaseRelevant") != null })
-    }
+val pushRelease by tasks.registering {
+    dependsOn(pushReleaseInternal, releaseTasks)
 }

@@ -1,7 +1,9 @@
+package de.skuzzle.release
+
 import de.skuzzle.semantic.Version
 import org.gradle.api.tasks.TaskAction
 
-abstract class PrepareReleaseTask : AbstractReleaseStep() {
+abstract class ReleaseLocalTask : AbstractReleaseStep() {
 
     @Throws(IllegalStateException::class)
     @TaskAction

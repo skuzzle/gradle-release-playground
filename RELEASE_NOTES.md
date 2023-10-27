@@ -1,1 +1,3 @@
-Release notes for 2.0.0-rc6
+Release notes for 1.2.3
+
+<unknown>

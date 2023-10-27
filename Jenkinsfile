@@ -32,14 +32,27 @@ pipeline {
         sh 'git status'
       }
     }
-    stage('Check working copy clean') {
+    stage('Check preconditions') {
       steps {
-        sh './gradlew checkCleanWorkingCopy'
+        withGradle {
+          sh './gradlew checkCleanWorkingCopy'
+        }
       }
     }
-    stage('Release') {
+    stage('Build & Test') {
       steps {
-        sh './gradlew release -PreleaseVersion=${RELEASE_VERSION}'
+        withGradle {
+          sh './gradlew verify'
+        }
+      }
+    }
+    stage('Perform release') {
+      steps {
+        withGradle {
+          sh './gradlew generateReadmeAndReleaseNotes build'
+          sh './gradlew releaseLocal'
+          sh './gradlew pushRelease'
+        }
       }
     }
   }

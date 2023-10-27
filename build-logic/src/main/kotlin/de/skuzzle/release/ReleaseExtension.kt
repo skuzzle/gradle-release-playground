@@ -1,3 +1,5 @@
+package de.skuzzle.release
+
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 

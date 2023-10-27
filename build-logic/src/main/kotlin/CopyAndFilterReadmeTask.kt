@@ -12,7 +12,7 @@ import org.gradle.kotlin.dsl.filter
 import java.io.File
 import javax.inject.Inject
 
-abstract class CopyAndFilterReadme : DefaultTask() {
+abstract class CopyAndFilterReadmeTask : DefaultTask() {
 
     @get:Inject
     abstract val fileSystemOps: FileSystemOperations

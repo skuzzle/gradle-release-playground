@@ -1,5 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
+package de.skuzzle.release
+
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 
@@ -23,7 +25,6 @@ class Git(
     private fun isReadonly() = readOnly.orElse(false).get()
 
     private fun isDebug() = debugOutput.orElse(false).get()
-
 
     fun git(vararg args: String): String {
         val fullArgs = listOf("git") + listOf(*args)
