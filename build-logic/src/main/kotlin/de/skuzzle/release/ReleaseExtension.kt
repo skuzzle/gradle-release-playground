@@ -9,6 +9,9 @@ abstract class ReleaseExtension {
     }
 
     @get:Input
+    abstract val releaseVersion: Property<String>
+
+    @get:Input
     abstract val dryRun: Property<Boolean>
 
     @get:Input
@@ -31,6 +34,7 @@ abstract class ReleaseExtension {
     fun wireUp(releaseStep: AbstractReleaseStep) {
         val extension = this
         releaseStep.apply {
+            this.releaseVersion.set(extension.releaseVersion)
             this.dryRun.set(extension.dryRun)
             this.verbose.set(extension.verbose)
             this.mainBranch.set(extension.mainBranch)

@@ -15,6 +15,9 @@ abstract class AbstractReleaseStep() : DefaultTask() {
     abstract val providers: ProviderFactory
 
     @get:Input
+    abstract val releaseVersion: Property<String>
+
+    @get:Input
     abstract val dryRun: Property<Boolean>
 
     @get:Input

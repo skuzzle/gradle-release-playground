@@ -12,6 +12,12 @@ val releaseExtension = extensions.create<ReleaseExtension>(ReleaseExtension.NAME
     mainBranch.convention("main")
     devBranch.convention("dev")
 
+    releaseVersion.convention(
+        providers.systemProperty("RELEASE_VERSION")
+            .orElse(providers.environmentVariable("RELEASE_VERSION"))
+            .orElse(providers.gradleProperty("releaseVersion"))
+    )
+
     dryRun.convention(
         providers.systemProperty("RELEASE_DRY_RUN").map { it == "true" }
             .orElse(providers.environmentVariable("RELEASE_DRY_RUN").map { it == "true" })
@@ -60,10 +66,7 @@ fun calculateVersion(): String {
     val git = Git(providers, releaseExtension.dryRun, releaseExtension.verbose)
     val latestTagValue = git.lastReleaseTag()
     val latestVersion = latestTagValue.substring(1)
-    val pversion = providers.systemProperty("RELEASE_VERSION")
-        .orElse(providers.environmentVariable("RELEASE_VERSION"))
-        .orElse(providers.gradleProperty("releaseVersion"))
-        .orNull
+    val pversion = releaseExtension.releaseVersion.orNull
     if (pversion != null) {
         return pversion.toString()
     }
