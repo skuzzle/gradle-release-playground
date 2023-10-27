@@ -42,14 +42,14 @@ pipeline {
     stage('Build & Test') {
       steps {
         withGradle {
-          sh './gradlew verify'
+          sh './gradlew check'
         }
       }
     }
     stage('Perform release') {
       steps {
         withGradle {
-          sh './gradlew generateReadmeAndReleaseNotes build'
+          sh './gradlew generateReadmeAndReleaseNotes check'
           sh './gradlew releaseLocal'
           sh './gradlew pushRelease'
         }

@@ -55,7 +55,9 @@ fun calculateVersion(): String {
     val git = Git(providers, releaseExtension.dryRun, releaseExtension.verbose)
     val latestTagValue = git.lastReleaseTag()
     val latestVersion = latestTagValue.substring(1)
-    val pversion = rootProject.findProperty("releaseVersion")?.toString()
+    val pversion = providers.systemProperty("RELEASE_VERSION")
+        .orElse(providers.gradleProperty("releaseVersion"))
+        .orNull
     if (pversion != null) {
         return pversion.toString()
     }
