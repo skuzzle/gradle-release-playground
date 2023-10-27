@@ -36,7 +36,7 @@ abstract class AbstractReleaseStep() : DefaultTask() {
     }
 
     fun print(s: String) {
-        println(s)
+        logger.lifecycle(s)
     }
 
     fun printOrVerbose(normal: String, verbose: String) {
@@ -45,7 +45,7 @@ abstract class AbstractReleaseStep() : DefaultTask() {
 
     fun printVerbose(s: String) {
         if (verbose.get()) {
-            print(s)
+            logger.lifecycle(s)
         }
     }
 
