@@ -1,3 +1,3 @@
-Release notes for 2.0.0-rc10
+Release notes for 3.0.0-prerelease
 
 <unknown>
